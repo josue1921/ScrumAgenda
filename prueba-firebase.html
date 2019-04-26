@@ -1,13 +1,22 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/polymerfire.html">
 <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase.js"></script>
 
 <dom-module id="prueba-firebase">
   <template>
+    <firebase-app>
+        
+    </firebase-app>
+    <firebase-query>
+        id="query"
+        app-name="notes"
+        path="/notes/[[uid]]"
+        data="{{data}}">
+    </firebase-query>
     <style>
     </style>
     <h2>Hello tu web component esta creado </h2>
   </template>
-
   <script>
     class Pruebafirebase extends Polymer.Element {
       static get is() { return 'prueba-firebase'; }
@@ -23,6 +32,10 @@
           prop: {type: String, value: "2"},
           ISEM: {type: String, value: "EJSC"},
           celu: {type: String, value: "7224499243"}
+            
+            type: Object,
+            observer: 'dataChanged'
+            }
         };
       }
       ready() {
