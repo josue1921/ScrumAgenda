@@ -38,9 +38,10 @@
             };
             firebase.initializeApp(config);
             console.log("Levanto la conexion exitosa");
-            const db = firebase.database();
-            const peros = db.child('personas');
-            const query = cursos.limitToFirst(1);
+            const db = firebase.database().ref('personas');;
+            const lista = db;
+            //const query = personas.orderByChild('name').equalTo('Ada Lovelace').limitToFirst(1);
+            console.log("Resultado: " + lista);
             
         }
     }
