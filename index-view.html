@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymerfire/polymerfire.html">
 <link rel="import" href="formulario-crud.html">
 
 <dom-module id="index-view">
@@ -59,17 +60,31 @@
         width: 310px;
         padding: 0 10px;
       }
-
     </style>
+    <firebase-app
+        auth-domain="agendascrum.firebaseapp.com"
+        database-url="https://agendascrum.firebaseio.com"
+        api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
+        name="agendascrum"
+        storage-bucket="agendascrum.appspot.com"
+        messaging-sender-id="agendascrum">
+    </firebase-app>
+    <firebase-query
+        id="personas"
+        app-name="agendascrum"
+        path="/personas"
+        data="{{lista}}">
+    </firebase-query>
 
-    <dom-repeat items="{{lista}}">
+    <dom-repeat items="{{lista}}" as="item">
     <template>
       <div class="column">
         <div class="card">
           <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
           <div class="card-body">
-            <h3 class="card-title">{{item.nombre}}</h3>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <h3 class="card-title">[[item.name]]</h3>
+            <p class="card-text">Telefono: [[item.tel]]</p>
+            <p class="card-text">Correo Electronico: [[item.email]]</p>
             <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit">Editar</button>
             <button type="button" on-click="deleteData" data-item$="[[item.id]]"  class="btn-delete">Eliminar</button>
           </div>
