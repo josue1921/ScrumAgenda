@@ -2,7 +2,8 @@
   "name": "index-view",
   "main": "index-view.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "paper-datatable-api": "RoXuS/paper-datatable-api#2.0.18"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
