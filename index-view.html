@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="index-view">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `index-view`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class IndexView extends Polymer.Element {
+      static get is() { return 'index-view'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'index-view'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(IndexView.is, IndexView);
+  </script>
+</dom-module>
