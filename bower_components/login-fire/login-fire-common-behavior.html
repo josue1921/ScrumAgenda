@@ -1,0 +1,510 @@
+<!--
+@license
+Copyright (c) 2016 Convoo All Rights Reserved.
+Use of this source code is governed by a MIT license that can be found in the
+LICENSE file or at https://github.com/convoo/login-fire/blob/master/LICENSE.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymerfire/firebase-auth.html">
+<script>
+(function() {
+  'use strict';
+
+  window.Convoo = window.Convoo || {};
+
+  /**
+   * Federated identity providers available for Firebase Authentication.
+   */
+  Convoo._firebaseProviders = {
+    anonymous: {
+      id: 'anonymous',
+      isSocialNetwork: false,
+      name: 'Anonymous'
+    },
+    facebook: {
+      id: 'facebook',
+      isSocialNetwork: true,
+      name: 'Facebook',
+      scopes: ''
+    },
+    github: {
+      id: 'github',
+      isSocialNetwork: true,
+      name: 'Github',
+      scopes: ''
+    },
+    google: {
+      id: 'google',
+      isSocialNetwork: true,
+      name: 'Google',
+      scopes: ''
+    },
+    email: {
+      id: 'email',
+      isSocialNetwork: false,
+      name: 'Email'
+    },
+    twitter: {
+      id: 'twitter',
+      isSocialNetwork: true,
+      name: 'Twitter',
+      scopes: ''
+    }
+  };
+
+  /**
+   * A behavior that allows an element using Firebase Auth to sign-in a user.
+   *
+   * If you want your element to authenticate a user with a federated identity
+   * provider _(Google, Facebook, Twitter, GitHub)_, it has to implement the
+   * `LoginFireSocialBehavior` behavior and use one of these providers:
+   *
+   * - anonymous (for signin anonymously)
+   * - facebook
+   * - github
+   * - google
+   * - twitter
+   *
+   * If you want your element to authenticate a user by email address and password,
+   * it has to implement the `LoginFireFormBehavior` behavior and use the provider
+   * 'email'.
+   *
+   * @polymerBehavior Convoo.LoginFireCommonBehavior
+   */
+  Convoo.LoginFireCommonBehaviorImpl = {
+    properties: {
+      /**
+       * An application name. This is required if you want use several Firebase
+       * configurations in the same app. All elements that implement this
+       * behavior and having the same application name share their properties.
+       *
+       * @type {String}
+       */
+      appName: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * Aggregate object with debug information including Firebase app name,
+       * provider and whether to redirect.
+       *
+       * @type {Object}
+       */
+      config: {
+        type: Object,
+        readOnly: true,
+        computed: '_computeConfig(appName, provider, redirect)'
+      },
+
+      /**
+       * Sets the element in debug mode. In the debug mode, the Firebase
+       * configuration used by the element and relevant steps like a user
+       * change are print out into the browser's console.
+       *
+       * @type {Boolean}
+       */
+      debug: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * ID of the federated identity provider to use. The list of available
+       * providers is located at `Convoo._firebaseProviders`.
+       *
+       * @type {String}
+       */
+      provider: {
+        type: String,
+        value: 'anonymous'
+      },
+
+      /**
+       * Defines if the authentication must use redirection. If `false`, the
+       * authentication will use pop-up.
+       *
+       * @type {Boolean}
+       */
+      redirect: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * `True` if a user is authenticated, otherwise `false`.
+       *
+       * @type {Boolean}
+       */
+      signedIn: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * Whether to show the view at sign up or sign in.
+       *
+       * @type {Boolean}
+       */
+      showSignUp: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+
+      /**
+       * When `true`, login status can be determined by checking user property.
+       *
+       * @type {Boolean}
+       */
+      statusKnown: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * Signed-in user. This user representation is accessible from all elements
+       * that use Firebase Auth with the same application name.
+       *
+       * @type {Object}
+       */
+      user: {
+        type: Object,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * Prevents the element from signing out. It means, if this attribute is
+       * `true`, the `signOut` method has no effect.
+       *
+       * @type {Boolean}
+       */
+      noSignOut: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Prevents the element from signing in. It means, if this attribute is
+       * `true`, the `signIn` method has no effect.
+       *
+       * @type {Boolean}
+       */
+      noSignIn: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * `True` if a user is authenticated, otherwise `false`.
+       *
+       * @type {Boolean}
+       */
+      _signedIn: {
+        type: Boolean,
+        observer: '_signedInChanged'
+      },
+
+      /**
+       * When `true`, login status can be determined by checking user property.
+       *
+       * @type {Object}
+       */
+      _statusKnown: {
+        type: Boolean,
+        observer: '_statusKnownChanged'
+      },
+
+      /**
+       * Signed-in user (private). It is accessible from all elements that use
+       * Firebase Auth with the same application name through the property
+       * `user`.
+       *
+       * @type {Object}
+       * @default null
+       */
+      _user: {
+        type: Object,
+        value: null,
+        observer: '_userChanged'
+      },
+
+      /**
+       * This property is used in `login-fire` and `login-fire-social` when the
+       * user is signed in and allowed to sign out. Then it shows only one
+       * button (instead of multiple) to sign out.
+       */
+      _showSignOutButton: {
+        type: Boolean,
+        computed: '_computeShowOneButton(noSignIn, signedIn, noSignOut)'
+      },
+
+      /**
+       * Indicates if a sign in or sign out process is currently in progress.
+       *
+       * @type {Boolean}
+       * @default false
+       */
+      inProgress: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        notify: true
+      },
+
+      /**
+       * When this attribute is `true`, the element tries to log the user in
+       * right after have been attached to the DOM if and only if the user was
+       * signed in when they left the application.
+       * 
+       * @type {Boolean}
+       * @default false
+       */
+      auto: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Reference to a private instance of FirebaseAuth element.
+       * 
+       * @type {Object}
+       */
+      _auth: Object
+    },
+
+    observers: [
+      '_fireEvent(_user, inProgress)'
+    ],
+
+    attached: function() {
+      if (this.localesFile && typeof this.localesFile !== 'undefined') {
+        this.loadResources(this.resolveUrl(this.localesFile));
+      } else {
+        this.set('resources', window.Convoo._locales);
+      }
+      if (this.auto) {
+        this.__injectFirebaseAuth();
+      }
+    },
+
+    ready: function() {
+      if (this.debug) {
+        console.debug('### Debug Mode Enabled ###');
+        console.debug('Initial configuration:', this.config);
+      }
+    },
+
+    /**
+     * Starts the sign-out process.
+     */
+    signOut: function() {
+      // Skip processing of this method when we already have started a signin or signout process
+      if (this.inProgress) {
+        if (this.debug) {
+          console.debug('Ignored signOut when already in progress');
+        }
+        return;
+      }
+
+      if (this.debug) {
+        console.debug(`The element ${this.is} can${this.noSignOut ? 'not' : ''} sign out.`);
+      }
+
+      if (!this.noSignOut && this.signedIn) {
+        // Set inProgress flag to true when a signout is started
+        this._setInProgress(true);
+        this._auth.signOut()
+          .then(() => this._setInProgress(false));
+      }
+    },
+
+    /**
+     * Computes the element configuration.
+     *
+     * @param  {String}  appName  the application name
+     * @param  {String}  provider id
+     * @param  {Boolean} redirect
+     * @return {Object}           the element configuration.
+     */
+    _computeConfig: function(appName, provider, redirect) {
+      return {
+        appName: appName,
+        provider: Convoo._firebaseProviders[provider],
+        redirect: redirect,
+        debug: this.debug
+      };
+    },
+
+    /**
+     * Returns `true` when the element allows only to signing out or a user is
+     * already signed in and they can signing out.
+     */
+    _computeShowOneButton: function(noSignIn, signedIn, noSignOut) {
+      return noSignIn || (signedIn && !noSignOut);
+    },
+
+    /**
+     * Fires the Firebase errors.
+     *
+     * @param  {Object} error get from Firebase Auth API
+     */
+    _fireError: function(error) {
+      if (this.debug) {
+        console.debug('Firing error');
+        console.debug(error);
+      }
+      this.fire('error', error);
+      this._setInProgress(false);
+    },
+
+    /**
+     * Fires an event for signaling the user is signed-in or signed-out.
+     *
+     * @param {Object} newUser        the new representation of the user
+     * @param {inProgress} inProgress the status of the sign-in/sign-out process
+     */
+    _fireEvent: function(newUser, inProgress) {
+      if (inProgress || newUser == this.user) {
+        return;
+      }
+      this._setUser(newUser);
+      // Signed out.
+      if (!this.user) {
+        if (this.debug) {
+          console.debug('User signed out from', this.config.provider.name);
+          console.debug('Firing event');
+        }
+        this.fire('signedout');
+        return;
+      }
+      // Signed in.
+      if (this.debug) {
+        console.debug('User signed in with', this.config.provider.name);
+        console.debug({
+          user: this.user
+        });
+        console.debug('Firing event');
+      }
+      this.fire('signedin', {
+        user: this.user
+      });
+    },
+
+    /**
+     * Updates the readOnly value of signedIn.
+     *
+     * @param  {Boolean} newVal
+     * @param  {Boolean} oldVal
+     */
+    _signedInChanged: function(newVal, oldVal) {
+      if (this.debug && typeof oldVal !== 'undefined') {
+        console.debug('SignedIn changed for', newVal);
+      }
+      this._setSignedIn(newVal);
+    },
+
+    /**
+     * Updates the readOnly value of statusKnown.
+     *
+     * @param  {Boolean} newVal
+     * @param  {Boolean} oldVal
+     */
+    _statusKnownChanged: function(newVal, oldVal) {
+      if (this.debug && typeof oldVal !== 'undefined') {
+        console.debug('StatusKnown changed for', newVal);
+      }
+      this._setStatusKnown(newVal);
+    },
+
+    /**
+     * Toggles signUp property
+     */
+    _toggleShowSignUp: function() {
+      this.showSignUp = !this.showSignUp;
+    },
+
+    /**
+     * Updates the readOnly value of user.
+     *
+     * @param  {Object} newVal is the signed-in user
+     * @param  {Object} oldVal is the previous signed-in user
+     */
+    _userChanged: function(newVal, oldVal) {
+      if (this.debug && typeof oldVal !== 'undefined') {
+        console.debug('User changed for', newVal);
+      }
+    },
+
+    /**
+     * Creates a new FirebaseAuth element and adds it into the shadow root of the
+     * element. Does nothing if a FirebaseAuth element is already present.
+     * 
+     * @return {Promise} a promise that resolve the FirebaseAuth element of the
+     * component implementing this behavior.
+     */
+    __injectFirebaseAuth: function() {
+      return new Promise((resolve, reject) => {
+        const shadowRoot = this.shadowRoot || this.shadyRoot;
+        this._auth = shadowRoot.querySelector('firebase-auth');
+        if (!this._auth) {
+          this._auth = this.__newFirebaseAuth(this.provider);
+          shadowRoot.appendChild(this._auth);
+        }
+        resolve(this._auth);
+      });
+    },
+
+    /**
+     * Creates a new instance of the FirebaseAuth element. This instance will
+     * link its "user", "status-known" and "signed-in" properties to the
+     * according properties (which the same names) of the element who called
+     * this method.
+     * 
+     * @return {HTMLElement} new instance of the FirebaseAuth element.
+     */
+    __newFirebaseAuth: function(provider) {
+      const fa = document.createElement('firebase-auth');
+      fa.id = 'auth';
+      fa.appName = this.appName;
+      fa.provider = provider;
+      fa.addEventListener('user-changed', event => this.set('_user', event.detail.value));
+      fa.addEventListener('status-known-changed', event => this.set('_statusKnown', event.detail.value));
+      fa.addEventListener('signed-in-changed', event => this.set('_signedIn', event.detail.value));
+      return fa;
+    },
+
+    /**
+     * Fired when Firebase returns an error.
+     *
+     * @event error
+     * @param  {Object} error returned by Firebase Auth API.
+     */
+
+    /**
+     * Fired when a `user` just signed-in.
+     *
+     * @event signedin
+     * @param {Object} user signed-in.
+     */
+
+    /**
+     * Fired when the `user` signed-out.
+     *
+     * @event signedout
+     */
+  };
+
+  /**
+   * @polymerBehavior
+   */
+  Convoo.LoginFireCommonBehavior = [
+    Convoo.LoginFireCommonBehaviorImpl
+  ];
+}());
+</script>

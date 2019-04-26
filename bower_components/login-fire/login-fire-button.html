@@ -1,0 +1,100 @@
+<!--
+@license
+Copyright (c) 2016 Convoo All Rights Reserved.
+Use of this source code is governed by a MIT license that can be found in the
+LICENSE file or at https://github.com/convoo/login-fire/blob/master/LICENSE.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./paper-social-button.html">
+<link rel="import" href="./login-fire-social-behavior.html">
+<link rel="import" href="./localize-behavior.html">
+
+<!--
+A button to authenticate a user with a federated identity provider such as Google, Facebook, Twitter or GitHub.
+
+Based on a [paper-button](https://github.com/PolymerElements/paper-button) and
+the [firebase-auth](https://github.com/firebase/polymerfire#firebase-auth) element,
+this button uses the [Firebase Auth API](https://firebase.google.com/docs/auth/)
+for the authentication. This element provides a direct access to an entity that
+represents the authenticated user.
+
+By default the button has a CSS style according to the chosen social network,
+logo included. You have all features of the paper-button and can use same
+providers as Firebase Auth allows. Internationalization is also supported
+and usable through a simple attribute. If you want to use a language that is not
+available, you can select a translation file embedded in your app or contribute
+to the project by adding it.
+
+Example:
+```
+<login-fire-button app-name="myApp" provider="google"></login-fire-button>
+<login-fire-button app-name="myApp" provider="facebook" flat></login-fire-button>
+<login-fire-button app-name="myApp" provider="twitter" flat mini></login-fire-button>
+```
+
+### Styling
+
+See the "Styling" section of the `paper-social-button` element documentation.
+
+@customElement
+@polymer
+@demo demo/login-fire-button.html
+-->
+<dom-module id="login-fire-button">
+  <template>
+    <style>
+    :host {
+      display: inline-block;
+      --login-fire-button: {
+        width: 100%;
+      };
+    }
+    </style>
+    <paper-social-button
+      provider="[[config.provider]]"
+      no-sign-in="[[noSignIn]]"
+      no-sign-out="[[noSignOut]]"
+      language="[[language]]"
+      show-sign-out$="[[_signedIn]]"
+      show-sign-up$="[[showSignUp]]"
+      show-progress-bar$="[[inProgress]]"
+      flat$="[[flat]]"
+      mini$="[[mini]]"
+      disabled$="[[inProgress]]"
+      on-tap="signInOrOut">
+    </paper-social-button>
+  </template>
+
+  <script>
+  Polymer({
+    is: 'login-fire-button',
+
+    behaviors: [
+      Convoo.LocalizeBehavior,
+      Convoo.LoginFireSocialBehavior
+    ],
+
+    properties: {
+      /**
+       * Mini format, yes or not.
+       *
+       * @type {Boolean}
+       */
+      mini: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Flat button, yes or not.
+       *
+       * @type {Boolean}
+       */
+      flat: {
+        type: Boolean,
+        value: false
+      }
+    }
+  });
+  </script>
+</dom-module>
