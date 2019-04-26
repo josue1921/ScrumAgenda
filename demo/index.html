@@ -3,23 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
-
     <title>index-view demo</title>
-
     <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../index-view.html">
-
-    <custom-style>
-      <style is="custom-style" include="demo-pages-shared-styles">
-      </style>
-    </custom-style>
+    <style>
+    body{
+      background-color: #f4f5f6;
+      font-family: sans-serif;
+    }
+      .title{
+        text-align: center;
+        font-family: sans-serif;
+      }
+    </style>
   </head>
   <body>
-    <div class="vertical-section-container centered">
-      <h3>Basic index-view demo</h3>
+    <div class="container">
+      <h2 class="title">Lista de Contactos</h2>
       <index-view></index-view>
     </div>
   </body>
