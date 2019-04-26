@@ -1,21 +1,30 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/polymer/polymerfire.html">
-<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase.js"></script>
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 
 <dom-module id="prueba-firebase">
   <template>
-    <firebase-app>
-        
+    <firebase-app
+        auth-domain="agendascrum.firebaseapp.com"
+        database-url="https://agendascrum.firebaseio.com"
+        api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
+        name="agendascrum"
+        storage-bucket="agendascrum.appspot.com"
+        messaging-sender-id="agendascrum">
     </firebase-app>
-    <firebase-query>
-        id="query"
-        app-name="notes"
-        path="/notes/[[uid]]"
-        data="{{data}}">
+    
+    <firebase-query
+        id="personas"
+        app-name="agendascrum"
+        path="/personas"
+        data="{{personas}}">
     </firebase-query>
     <style>
     </style>
-    <h2>Hello tu web component esta creado </h2>
+    <h2>Hello tu web component esta creado: [[data]] </h2>
+    <template is="dom-repeat" items="{{ personas }}" as="item">
+            <li>{{ item.name }}</li>
+        </template>
+    
   </template>
   <script>
     class Pruebafirebase extends Polymer.Element {
@@ -26,37 +35,9 @@
             type: String,
             value: 'prueba-firebase'
           },
-          name: {type: String, value: "Edwin Josue"},
-          userId: {type: String, value: "2"},
-          email: {type: String, value: "josue@live.com"},
-          prop: {type: String, value: "2"},
-          ISEM: {type: String, value: "EJSC"},
-          celu: {type: String, value: "7224499243"}
-            
-            type: Object,
-            observer: 'dataChanged'
-            }
+          personas: {type: Object }
         };
       }
-      ready() {
-            super.ready();
-            console.log('Selevanto conexion de BD');
-            var config = {
-                apiKey: "y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G",
-                authDomain: "agendascrum.firebaseapp.com",
-                databaseURL: "https://agendascrum.firebaseio.com/",
-                projectId: "agendascrum",
-                storageBucket: "bucket.appspot.com"
-                
-            };
-            firebase.initializeApp(config);
-            console.log("Levanto la conexion exitosa");
-            const db = firebase.database().ref('personas');;
-            const lista = db;
-            //const query = personas.orderByChild('name').equalTo('Ada Lovelace').limitToFirst(1);
-            console.log("Resultado: " + lista);
-            
-        }
     }
 
  
