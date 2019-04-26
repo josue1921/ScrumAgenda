@@ -1,10 +1,11 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="formulario-crud.html">
 
 <dom-module id="index-view">
   <template>
     <style>
       .btn-edit{
-        background-color: #307ce0;
+        background-color: #007bff;
         border:0px;
         padding:7px;
         margin:10px;
@@ -12,7 +13,7 @@
         border-radius:10px;
       }
       .btn-delete{
-        background-color: #307ce0;
+        background-color: #acacac;
         border:0px;
         padding:7px;
         margin:10px;
@@ -22,6 +23,11 @@
       }
       .btn-edit:hover{
         background-color:;
+        outline:none;
+        cursor:pointer;
+      }
+      .btn-delete:hover{
+        background-color:#dc3545;
         outline:none;
         cursor:pointer;
       }
@@ -64,14 +70,18 @@
           <div class="card-body">
             <h3 class="card-title">{{item.nombre}}</h3>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <button type="button" name="button" class="btn-edit">Editar</button>
-            <button type="button" name="button" class="btn-delete">Eliminar</button>
+            <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit">Editar</button>
+            <button type="button" on-click="deleteData" data-item$="[[item.id]]"  class="btn-delete">Eliminar</button>
           </div>
         </div>
       </div>
 
     </template>
     </dom-repeat>
+
+    <div id="contentmodal">
+
+    </div>
 
 
   </template>
@@ -107,9 +117,20 @@
                   {
                     "id":5,"nombre":"Alberto", "telefono":"23345689","correo":"correo@softtek.com"
                   }
+
             ]
           }
         };
+      }
+      deleteData(data){
+        //se recupera el id del registro seleccionado
+        console.log(data.target.dataset.item);
+      }
+      editData(data){
+        console.log(data.target.dataset.item);
+        this.$.contentmodal.innerHTML=`
+          <formulario-crud disparador=true><formulario-crud>
+        `
       }
     }
 
