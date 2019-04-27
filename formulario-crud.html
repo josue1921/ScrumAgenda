@@ -1,0 +1,229 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../file-input/image-input.html">
+
+<dom-module id="formulario-crud">
+  <template>
+    <style>
+      .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 80px; /* Location of the box */
+          left:0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 1px solid #888;
+          width: 80%;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          -webkit-animation-name: animatetop;
+          -webkit-animation-duration: 0.4s;
+          animation-name: animatetop;
+          animation-duration: 0.4s
+        }
+
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        /* The Close Button */
+        .close {
+          color: black;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .modal-header {
+          padding: 2px 16px;
+
+        }
+
+        .modal-body {
+          padding: 2px 16px;
+        }
+
+        .modal-footer {
+          padding: 2px 16px;
+
+        }
+        .separadorCampos{
+          width:95%;
+          display:inline-block;
+          padding:15px;
+
+        }
+        image-input.top-left {
+          --image-input-width: 300px;
+          --image-input-height: 180px;
+          --image-input-button: {
+            left: -16px;
+            top: -16px;
+            right: auto;
+            bottom: auto;
+            background-color:#acacac;
+          };
+          left:100px;
+          display: flex;
+           justify-content: center;
+        }
+        .btn-cancel{
+          background-color: #ff0000; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .btn-save{
+          background-color: #028107; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .div-buttons{
+          display:flex;
+          justify-content:space-between;
+        }
+    </style>
+
+
+    <div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header" id="titleModal">
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <div class="separadorCampos">
+          <paper-input label="Nombre">
+            <iron-icon icon="account-circle" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Correo Electronico">
+            <iron-icon icon="mail" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Telefono">
+            <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
+          </paper-input>
+          <br>
+          <image-input class="top-left" position="center" preload fade placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAG1BMVEUAAAD///9/f38/Pz8fHx9fX1+/v7+fn5/f39+rr0+4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABWUlEQVRoge2TT2+CMBiHX6GoR5L5AYhu6pGEiNduYQlHIod5NNvsdjRmsqvb9Huv4CYVyp9l199zIPBr+7xt30AEAAAAAAAAAACAdhhO/fh4nU6pmdUg6L2xBkEDnVZlaggbBSZn7iJiQ5doNhkR3W3diMzJtSIweSrIs0sMxxjHWz9+JGsdLyPr6L0fKImXbjaafIjfSzxnZcEV9Z9PezVXfVltYGyI7fMdZAIlKwk21HVIrpTYvnwM0vengkDJSgKHehF1ObHZ0J6nlvTqdxQEXBGcsnrBeOTZISdrdSuE+DSFPH4uyLJ6gTwK2cbRm/IwHz4LQt3iS4E8JbP797KhHY2g00pg2Nldys+SQMmqBD2HHvbmq9gR+yLiBYGSVQmYSJw9EZuvyH9JNgWBklXCfirIdgeaYrpMj7bdf4Ad/rPav/Gm2n+mdfnFtqpfAAAAAAAAANCKb8w3PQYNl7XnAAAAAElFTkSuQmCC"></image-input>
+        </div>
+        <div class="modal-footer">
+          <hr>
+          <div class="div-buttons">
+            <button type="button" on-click="saveData" class="btn-save"><iron-icon icon="save" slot="prefix"></iron-icon>Guardar</button>
+            <button type="button" on-click="cerrarModal" class="btn-cancel"> <iron-icon icon="cancel" slot="prefix"></iron-icon>Cancelar</button>
+          </div>
+        </div>
+      </form>
+  </div>
+
+</div>
+
+  </template>
+
+  <script>
+    /**
+     * `index-view`
+     *
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class FormularioCrud extends Polymer.Element {
+      static get is() { return 'formulario-crud'; }
+      static get properties() {
+        return {
+          disparador: {
+            type: Boolean,
+            observer:"mostrarModal"
+          },
+          idselected:{
+            type:Number,
+            value:0,
+            observer:"mostrarDatos"
+          }
+        };
+      }
+      mostrarModal(){
+        let disp=this.get('disparador');
+        if(disp){
+          console.log("mistrando el modal Editar");
+            this.$.myModal.style.display = "block";
+        }else{
+          console.log("mistrando el modal NUEVO");
+        }
+      }
+      cerrarModal(){
+          this.$.myModal.style.display = "none";
+      }
+      mostrarDatos(){
+        let idseleccionado=this.get("idselected");
+        if(idseleccionado!=0){
+          var h2 = document.createElement("h3")
+          h2.innerHTML=`
+            Modificar : <strong>aqui poner el nombre del contacto a Modificar</strong>
+          `
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+        }else{
+          var h2 = document.createElement("h2")
+          h2.innerText="Crear Nuevo Contacto";
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+
+        }
+      }
+
+    }
+
+    window.customElements.define(FormularioCrud.is, FormularioCrud);
+  </script>
+</dom-module>

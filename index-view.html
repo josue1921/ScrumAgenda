@@ -1,28 +1,44 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymerfire/polymerfire.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="formulario-crud.html">
 
 <dom-module id="index-view">
   <template>
     <style>
       .btn-edit{
-        background-color: #307ce0;
-        border:0px;
-        padding:7px;
-        margin:10px;
-        width:100px;
-        border-radius:10px;
+        background-color: #64d3fc;
+       border: none;
+       border-radius:8px;
+       color: white;
+       padding: 10px;
+       text-align: center;
+       text-decoration: none;
+       display: inline-block;
+       font-size: 12px;
+       margin: 4px 2px;
+       cursor: pointer;
       }
       .btn-delete{
-        background-color: #307ce0;
-        border:0px;
-        padding:7px;
-        margin:10px;
-        width:100px;
-        border-radius:10px;
-        float:right;
+        background-color: #acacac;
+        border: none;
+        border-radius:8px;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
       }
       .btn-edit:hover{
-        background-color:;
+        background-color:#007bff;
+        outline:none;
+        cursor:pointer;
+      }
+      .btn-delete:hover{
+        background-color:#dc3545;
         outline:none;
         cursor:pointer;
       }
@@ -37,7 +53,6 @@
       }
       .card-img-top{
         width:250px;
-        display:block;
         margin: auto;
         padding:10px;
 
@@ -49,11 +64,70 @@
         text-align:center;
         font-family: sans-serif;
       }
-      .column {
-        float: left;
-        width: 310px;
-        padding: 0 10px;
+      .div-buttons{
+        display:flex;
+        justify-content:space-between;
       }
+      .container{
+        width:100%;
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+
+      }
+
+.contenedor{
+  width:90px;
+  height:240px;
+  position:fixed;
+  right:0px;
+  bottom:0px;
+}
+.botonF1{
+  width:60px;
+  height:60px;
+  border-radius:100%;
+  background:#0c661d;
+  right:0;
+  bottom:0;
+  position:absolute;
+  margin-right:16px;
+  margin-bottom:16px;
+  border:none;
+  outline:none;
+  color:#FFF;
+  font-size:36px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  transition:.3s;
+}
+span{
+  transition:.5s;
+}
+.botonF1:hover span{
+  transform:rotate(360deg);
+}
+.botonF1:active{
+  transform:scale(1.1);
+}
+.btn{
+  width:40px;
+  height:40px;
+  border-radius:100%;
+  border:none;
+  color:#FFF;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  font-size:28px;
+  outline:none;
+  position:absolute;
+  right:0;
+  bottom:0;
+  margin-right:26px;
+  transform:scale(0);
+}
+.animacionVer{
+  transform:scale(1);
+}
+
     </style>
     <firebase-app
         id="firebase"
@@ -79,21 +153,38 @@
         app-name="agendascrum"
         path="/users/contactos"
         data="{{datos}}">
-    </firebase-query>-->
-    <dom-repeat items="[[lista]]" as="item" id="item">
-    <template>
-      <div class="column">
-        <div class="card">
-          <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
-          <div class="card-body">
-            <h3 class="card-title">[[item.name]]</h3>
-            <p class="card-text">Telefono: [[item.phone]]</p>
-            <p class="card-text">Correo Electronico: [[item.email]]</p>
-            <button type="button" class="btn-edit">Editar</button>
-            <button type="button" class="btn-delete" on-tap="remove" id="dele" value="[[item]]">Eliminar</button>
+    </firebase-query>
+      <div class="container">
+        <dom-repeat items="{{lista}}" as="item">
+        <template>
+          <div >
+            <div class="card">
+              <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
+              <div class="card-body">
+                <h3 class="card-title">[[item.name]]</h3>
+                <p class="card-text">Telefono: [[item.tel]]</p>
+                <p class="card-text">Correo Electronico: [[item.email]]</p>
+                <div >
+                  <hr>
+                  <div class="div-buttons">
+                    <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit"><iron-icon icon="create" slot="prefix"></iron-icon>Editar</button>
+                    <button type="button" on-click="deleteData" data-item$="[[item.id]]"  class="btn-delete"> <iron-icon icon="delete" slot="prefix"></iron-icon>Eliminar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+        </template>
+        </dom-repeat>
+
+        <div class="contenedor">
+            <button type="button" class="botonF1" title="Nuevo COntacto" on-click="newData">
+              <span >+</span>
+            </button>
+         </div>
       </div>
+    <div id="contentmodal">
 
 
 
@@ -112,9 +203,49 @@
       static get is() { return 'index-view'; }
       static get properties() {
         return {
+          lista: {
+            type: Array,
+            value: [
+                  {
+                     "id":1,"nombre":"Jose Carlos", "telefono":"24234344256","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":2,"nombre":"Roberto", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":3,"nombre":"Pedro", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":4,"nombre":"Rodrigo", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":5,"nombre":"Alberto", "telefono":"23345689","correo":"correo@softtek.com"
+                  }
+
+            ]
+          },
           datos: {
             type: Object,
             value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
+          }
+
+        };
+      }
+      deleteData(data){
+        //se recupera el id del registro seleccionado
+        console.log(data.target.dataset.item);
+      }
+      editData(data){
+        console.log(data.target.dataset.item);
+        let id=data.target.dataset.item;
+        this.$.contentmodal.innerHTML=`
+          <formulario-crud disparador=true idselected=${id}><formulario-crud>
+        `
+      }
+      newData(){
+        this.$.contentmodal.innerHTML=`
+          <formulario-crud disparador=true><formulario-crud>
+        `
             },
             pathmodifica: String,
             key: String
@@ -142,15 +273,29 @@
             });
 
       }
-      //instrucciones para la baja de un registro de firebase
-      //let key = e.currentTarget.item.$id;
-      // remove(e) {
-      //     //let val = this.$.dele.value;
-      //     //let val = e.path[0].value;
-      //     //let id = e.currentTarget.item.id;
-      //     let id = "persona2";
-      //     this.$.remove.ref.child(id).remove();
-      // }
+
+  // ready(){
+  //   super.ready();
+  //   console.log('Ejecutándose ready ');
+  //   //instrucciones para alta de nuevos registros a firebase
+  //   this.$.insert.ref.push({
+  //     id: 3,
+  //     email: "insert2@live.com",
+  //     name: "prueba insert1",
+  //     phone: "7224499243",
+  //     image: "ejemplo ruta:"
+  //   });
+  //
+  // }
+  //instrucciones para la baja de un registro de firebase
+  //let key = e.currentTarget.item.$id;
+  // remove(e) {
+  //     //let val = this.$.dele.value;
+  //     //let val = e.path[0].value;
+  //     //let id = e.currentTarget.item.id;
+  //     let id = "persona2";
+  //     this.$.remove.ref.child(id).remove();
+  // }
     }
 
     window.customElements.define(IndexView.is, IndexView);
