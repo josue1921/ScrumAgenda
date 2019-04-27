@@ -56,6 +56,7 @@
             validaInfo(){
               let valUse = this.$.datouser.value;
               let valPas = this.$.datopass.value;
+              let padre;
               console.log("Este es el usuario capturado .." + valUse);
               let bandera = 0;
               let nombre = "";
@@ -65,12 +66,17 @@
                 if (user === valUse && pass === valPas){
                   console.log("Bienvenido si eres usuario.");
                   nombre = element.name;
-                  bandera = 1
+                  bandera = 1;
+                  padre = element.$key;
                   return;
                 }
               });
               (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda, " + nombre);
-
+              document.getElementById('contenedor').innerHTML =`
+              <index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>
+              `;
+              //pathModifica='users/usuario1/contactos'
+              //document.getElementById('contenedor').innerHTML = "holacrayola";
 
             }
             created(){

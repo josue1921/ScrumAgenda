@@ -65,10 +65,10 @@
     <firebase-query
         id="personas"
         app-name="agendascrum"
-        path="/users/contactos"
+        path="[[pathmodifica]]"
         data="{{lista}}">
     </firebase-query>
-    <firebase-query
+    <!--<firebase-query
         id="insert"
         app-name="agendascrum"
         path="/users/contactos"
@@ -79,7 +79,7 @@
         app-name="agendascrum"
         path="/users/contactos"
         data="{{datos}}">
-    </firebase-query>
+    </firebase-query>-->
     <dom-repeat items="[[lista]]" as="item" id="item">
     <template>
       <div class="column">
@@ -95,21 +95,19 @@
         </div>
       </div>
 
+
+
     </template>
     </dom-repeat>
+    <div>
+          <button type="button" name="button" on-click="agrega">AGREGA</button>
+    </div>
 
 
   </template>
 
   <script>
-    /**
-     * `index-view`
-     *
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
+
     class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
@@ -117,20 +115,31 @@
           datos: {
             type: Object,
             value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
-          }
+            },
+            pathmodifica: String,
+            key: String
         };
       }
       ready(){
         super.ready();
-        console.log('Ejecutándose ready ');
-        //instrucciones para alta de nuevos registros a firebase
-        this.$.insert.ref.push({
-          id: 3,
-          email: "insert2@live.com",
-          name: "prueba insert1",
-          phone: "7224499243",
-          image: "ejemplo ruta:"
-        });
+        console.log('Ejecutándose ready');
+        //console.log(this.key);
+        //this.pathModifica = '/users/usuario1/contactos' ;
+        //console.log(this.path-modifica);
+        //this.pathModifica = '/users/usuario1/contactos' ;
+        //this.pathModifica = '/users/'+prompt("ingresa usuario")+'/contactos' ;
+
+      }
+      agrega(){
+            //instrucciones para alta de nuevos registros a firebase
+            console.log(this.$.personas.ref);
+            this.$.personas.ref.push({
+              id: 3,
+              email: "insert2@live.com",
+              name: "prueba insert1",
+              phone: "7224499243",
+              image: "ejemplo ruta:"
+            });
 
       }
       //instrucciones para la baja de un registro de firebase
