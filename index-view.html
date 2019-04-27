@@ -130,18 +130,30 @@ span{
 
     </style>
     <firebase-app
+        id="firebase"
         auth-domain="agendascrum.firebaseapp.com"
         database-url="https://agendascrum.firebaseio.com"
         api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
-        name="agendascrum"
-        storage-bucket="agendascrum.appspot.com"
-        messaging-sender-id="agendascrum">
+        name="agendascrum">
     </firebase-app>
     <firebase-query
         id="personas"
         app-name="agendascrum"
-        path="/personas"
+        path="/users/contactos"
         data="{{lista}}">
+    </firebase-query>
+
+    <firebase-query
+        id="insert"
+        app-name="agendascrum"
+        path="/users/contactos"
+        data="{{datos}}">
+    </firebase-query>
+    <firebase-query
+        id="remove"
+        app-name="agendascrum"
+        path="/users/contactos"
+        data="{{datos}}">
     </firebase-query>
       <div class="container">
         <dom-repeat items="{{lista}}" as="item">
@@ -189,7 +201,7 @@ span{
      * @polymer
      * @demo demo/index.html
      */
-    class IndexView extends Polymer.Element {
+    class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
         return {
@@ -213,7 +225,12 @@ span{
                   }
 
             ]
+          },
+          datos: {
+            type: Object,
+            value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
           }
+
         };
       }
       deleteData(data){
@@ -233,6 +250,29 @@ span{
         `
 
       }
+
+  // ready(){
+  //   super.ready();
+  //   console.log('Ejecutándose ready ');
+  //   //instrucciones para alta de nuevos registros a firebase
+  //   this.$.insert.ref.push({
+  //     id: 3,
+  //     email: "insert2@live.com",
+  //     name: "prueba insert1",
+  //     phone: "7224499243",
+  //     image: "ejemplo ruta:"
+  //   });
+  //
+  // }
+  //instrucciones para la baja de un registro de firebase
+  //let key = e.currentTarget.item.$id;
+  // remove(e) {
+  //     //let val = this.$.dele.value;
+  //     //let val = e.path[0].value;
+  //     //let id = e.currentTarget.item.id;
+  //     let id = "persona2";
+  //     this.$.remove.ref.child(id).remove();
+  // }
     }
 
     window.customElements.define(IndexView.is, IndexView);

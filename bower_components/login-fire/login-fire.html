@@ -1,0 +1,533 @@
+<!--
+@license
+Copyright (c) 2016 Convoo All Rights Reserved.
+Use of this source code is governed by a MIT license that can be found in the
+LICENSE file or at https://github.com/convoo/login-fire/blob/master/LICENSE.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./localize-behavior.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../reverse-element/reverse-element.html">
+<link rel="import" href="./login-fire-form.html">
+<link rel="import" href="./login-fire-social.html">
+<link rel="import" href="./paper-social-button.html">
+
+<!--
+An element allowing user authentication with email and password or federated
+identity providers (Google, Facebook, Twitter and GitHub) using the
+[Firebase Auth API](https://firebase.google.com/docs/auth/).
+
+Displaying a login form and a list of button (Google, Facebook, Twitter, GitHub)
+for user authentication. You can can easily choose which buttons to display and how to
+organize them with the form. See the demo page for more details.
+
+For email-password authentication only, use `<login-fire-form>`.
+For authenticating with multiple federated identity providers only, use `<login-fire-social>` and for a single provider, use `<login-fire-button>`.
+
+Example:
+```
+<firebase-app
+ name="demo"
+ api-key="API_KEY"
+ auth-domain="AUTH_DOMAIN"
+ database-url="DATABASE_URL"></firebase-app>
+<login-fire app-name="demo" providers="google, facebook, twitter, github, anonymous"></login-fire>
+```
+
+### Styling
+
+Style the buttons with CSS as you would a normal DOM element. The following custom
+properties and mixins are available for styling:
+
+Custom property | Description | Default
+--- | --- | ---
+`--login-fire-divider-color` | The color for the divider bar | `gray`
+`--login-fire-background-color` | The color for the divider bar | `white`
+
+@customElement
+@polymer
+@demo demo/login-fire.html
+-->
+<dom-module id="login-fire">
+  <template>
+    <style>
+    reverse-element {
+      background: var(--login-fire-background-color, white);
+      @apply --layout-horizontal;
+      @apply --layout-wrap;
+      @apply --layout-center-center;
+    }
+    :host([horizontal]) reverse-element {
+      @apply --layout-vertical;
+      @apply --layout-center;
+    }
+    .div {
+      @apply --layout-center-center;
+      background-color: var(--login-fire-divider-color, lightgray);
+    }
+    .div__span {
+      line-height: 15px;
+      padding: 16px;
+      background: var(--login-fire-background-color, white);
+      font-size: 12px;
+      font-style: italic;
+      color: var(--login-fire-divider-color, gray);
+      font-weight: lighter;
+      -moz-user-select: -moz-none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+    }
+    .div--hidden {
+      display: none;
+    }
+    .div--vertical {
+      @apply --layout-horizontal;
+      margin: 0 50px;
+      min-height: 200px;
+      max-height: 400px;
+      width: 1px;
+    }
+    .div--horizontal {
+      @apply --layout-vertical;
+      height: 1px;
+      margin: 50px 0;
+      min-width: 300px;
+      max-width: 400px;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    </style>
+
+    <template is="dom-if" if="[[_showSignOutButton]]">
+      <paper-social-button
+        signed-in="[[signedIn]]"
+        mini$="[[mini]]"
+        flat$="[[flat]]"
+        no-sign-in
+        locales-file="[[localesFile]]"
+        language="[[language]]"
+        disabled$="[[inProgress]]"
+        on-click="signOut">
+      </paper-social-button>
+    </template>
+
+    <template is="dom-if" if="[[!_showSignOutButton]]">
+      <reverse-element reverse="[[reverse]]">
+        <login-fire-form
+          app-name="[[appName]]"
+          user="{{user}}"
+          in-progress="{{_inProgressForm}}"
+          signed-in="{{signedIn}}"
+          status-known="{{statusKnown}}"
+          no-sign-out="[[noSignOut]]"
+          no-sign-in="[[noSignIn]]"
+          auto-sign-up="[[autoSignUp]]"
+          show-sign-up="{{showSignUp}}"
+          flat="{{flat}}"
+          locales-file="[[localesFile]]"
+          language="[[language]]"
+          auto="[[auto]]"
+          debug="[[debug]]"
+          no-toggleable-password="[[noToggleablePassword]]"
+          password-regex="{{passwordRegex}}"
+          email-regex="{{emailRegex}}"
+          reenter-password="[[reenterPassword]]">
+        </login-fire-form>
+
+        <div class$="div [[_dividerStyle]]" hidden$="[[noDivider]]">
+          <span class="div__span">[[localize('lf-or')]]</span>
+        </div>
+
+        <login-fire-social
+          app-name="[[appName]]"
+          providers="[[providers]]"
+          user="{{user}}"
+          in-progress="{{_inProgressSocial}}"
+          signed-in="{{signedIn}}"
+          status-known="{{statusKnown}}"
+          no-sign-in="[[noSignIn]]"
+          no-sign-out="[[noSignOut]]"
+          redirect="[[redirect]]"
+          mini$="[[mini]]"
+          horizontal$="[[horizontal]]"
+          show-sign-up="{{showSignUp}}"
+          flat="{{flat}}"
+          locales-file="[[localesFile]]"
+          language="[[language]]"
+          google-scopes="[[googleScopes]]"
+          facebook-scopes="[[facebookScopes]]"
+          github-scopes="[[githubScopes]]"
+          auto="[[auto]]"
+          debug="[[debug]]">
+        </login-fire-social>
+      </reverse-element>
+    </template>
+
+    <iron-media-query query="(max-width: 650px)" query-matches="{{_isNarrow}}">
+    </iron-media-query>
+  </template>
+
+  <script>
+  Polymer({
+    is: 'login-fire',
+
+    behaviors: [
+      Convoo.LocalizeBehavior,
+    ],
+
+    properties: {
+      /**
+       * An application name. This is required if you want use several Firebase
+       * configurations in the same app. All elements that implement this
+       * behavior and having the same application name share their properties.
+       *
+       * @type {String}
+       */
+       appName: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * Enables automatic sign-up on form if the user does not exist.
+       *
+       * @type {Boolean}
+       */
+      autoSignUp: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Prefers a horizontally structured social login.
+       *
+       * @type{Boolean}
+       */
+      horizontal: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Providers names. A list of the providers names, seperated by comma, to
+       * use for authentication. A button is displayed for each provider.
+       *
+       * Current accepted providers are:
+       *
+       * ```
+       * 'anonymous' (for signin anonymously)
+       * 'facebook'
+       * 'github'
+       * 'google'
+       * 'twitter'
+       * ```
+       *
+       * @type {String}
+       */
+      providers: {
+        type: String,
+        value: 'anonymous'
+      },
+
+      /**
+       * Displays mini social sign in buttons removing the "Sign in with" text
+       */
+      mini: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Hides the divider.
+       *
+       * @type {Boolean}
+       */
+      noDivider: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Displays social buttons first instead of the form. By default, the form
+       * is displayed first.
+       *
+       * @type{Boolean}
+       */
+      reverse: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Removes the view button on the password input
+       */
+      noToggleablePassword: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Adds another input to re-enter password in the sign up view
+       */
+      reenterPassword: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Regular expression used to check password strength. The default Regex
+       * checks if the password has a length at least of 8 chars and contains:
+       * - 2 uppercase letters
+       * - 1 special char letter [!@#$&*]
+       * - 2 digits
+       * - 3 lowercase letters
+       * 
+       * Password strength validation can be disabled by setting this property
+       * to "none", "null" or a falsy value.
+       * 
+       * @type {String}
+       */
+      passwordRegex: {
+        type: String,
+      },
+
+      /**
+       * Regular expression used to check email address format. It's a simplified
+       * version that check the email address has the same syntax as described
+       * on <a href="https://en.wikipedia.org/wiki/Email_address">Wikipedia</a>.
+       * Pay attention, quoted email addresses are not passing the validation due
+       * to the complexity of the regular expression it should have been write.
+       *
+       * Email address syntax validation can be disabled by setting this property
+       * to "none", "null" or a falsy value.
+       *
+       * @type {String}
+       */
+      emailRegex: {
+        type: String,
+      },
+
+      /**
+       * GitHub scopes.
+       *
+       * @type {String}
+       */
+      githubScopes: {
+        type: String
+      },
+
+      /**
+       * Google scopes.
+       *
+       * @type {String}
+       */
+      googleScopes: {
+        type: String
+      },
+
+      /**
+       * Facebook scopes.
+       *
+       * @type {String}
+       */
+      facebookScopes: {
+        type: String
+      },
+
+      /**
+       * Sets the element in debug mode. In the debug mode, the Firebase
+       * configuration used by the element and relevant steps like a user
+       * change are print out into the browser's console.
+       *
+       * @type {Boolean}
+       */
+       debug: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Defines if the authentication must use redirection. If `false`, the
+       * authentication will use pop-up.
+       *
+       * @type {Boolean}
+       */
+       redirect: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * When this attribute is `true`, the element tries to log the user in
+       * right after have been attached to the DOM if and only if the user was
+       * signed in when they left the application.
+       * 
+       * @type {Boolean}
+       * @default false
+       */
+       auto: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * `True` if a user is authenticated, otherwise `false`.
+       *
+       * @type {Boolean}
+       */
+       signedIn: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+
+      /**
+       * Whether to show the view at sign up or sign in.
+       *
+       * @type {Boolean}
+       */
+      showSignUp: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+
+      /**
+       * When `true`, login status can be determined by checking user property.
+       *
+       * @type {Boolean}
+       */
+      statusKnown: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+
+      /**
+       * Signed-in user. This user representation is accessible from all elements
+       * that use Firebase Auth with the same application name.
+       *
+       * @type {Object}
+       */
+      user: {
+        type: Object,
+        notify: true
+      },
+
+      /**
+       * Prevents the element from signing out. It means, if this attribute is
+       * `true`, the `signOut` method has no effect.
+       *
+       * @type {Boolean}
+       */
+      noSignOut: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Prevents the element from signing in. It means, if this attribute is
+       * `true`, the `signIn` method has no effect.
+       *
+       * @type {Boolean}
+       */
+      noSignIn: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * This property is used in `login-fire` and `login-fire-social` when the
+       * user is signed in and allowed to sign out. Then it shows only one
+       * button (instead of multiple) to sign out.
+       */
+       _showSignOutButton: {
+        type: Boolean,
+        computed: '_computeShowOneButton(noSignIn, signedIn, noSignOut)'
+      },
+
+      /**
+       * True if the element is too much narrow to be display horizontally.
+       *
+       * @type {Boolean}
+       */
+      _isNarrow: {
+        type: Boolean
+      },
+
+      /**
+       * Sets the divider in horizontal or vertical orientation.
+       *
+       * @type {String}
+       */
+      _dividerStyle: {
+        type: String,
+        computed: '_computeDividerStyle(_isNarrow, horizontal)'
+      },
+
+      inProgress: {
+        type: Boolean,
+        notify: true,
+        computed: '_computeInProgress(_inProgressForm, _inProgressSocial)'
+      }
+    },
+
+    /**
+     * Signs the user out regardless the provider used for the sign-in.
+     */
+    signOut: function() {
+      this.$$('login-fire-social').signOut();
+    },
+
+    /**
+     * Signs the user in using the target provider. It's not possible to sign in
+     * using the provider "email" when only one button is displayed. Also, does
+     * nothing if a user is already signed in.
+     *
+     * @param  {String} provider name
+     */
+    signInWith: function(provider) {
+      if (this.signedIn) {
+        return;
+      }
+
+      if (provider === 'email') {
+        if (this._showSignOutButton) {
+          console.error("Can't sign in using provider \"email\" when only one button is displayed.");
+        } else {
+          this.$$('login-fire-form').confirm();
+        }
+      } else {
+        this.$$('login-fire-social').signInWith(provider);
+      }
+    },
+
+    /**
+     * Computes CSS class for the divider.
+     *
+     * @param  {Boolean} isNarrow
+     * @param  {Boolean} horizontal
+     * @return {String}            CSS class to set to the divider
+     */
+    _computeDividerStyle: function(isNarrow, horizontal) {
+      return (horizontal || isNarrow) ? 'div--horizontal' : 'div--vertical';
+    },
+
+    _computeInProgress() {
+      return this._inProgressForm || this._inProgressSocial;
+    },
+
+    /**
+     * Returns `true` when the element allows only to signing out or a user is
+     * already signed in and they can signing out.
+     */
+     _computeShowOneButton: function(noSignIn, signedIn, noSignOut) {
+      return noSignIn || (signedIn && !noSignOut);
+    },
+
+  });
+  </script>
+</dom-module>

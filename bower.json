@@ -5,7 +5,8 @@
     "polymer": "Polymer/polymer#^2.0.0",
     "paper-datatable-api": "RoXuS/paper-datatable-api#2.0.18",
     "polymerfire": "FirebaseExtended/polymerfire#2.2.1",
-    "file-input": "framled/file-input#^2.0.2"
+    "file-input": "framled/file-input#^2.0.2",
+    "login-fire": "convoo/login-fire#2.1.1"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
