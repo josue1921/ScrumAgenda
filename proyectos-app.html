@@ -3,11 +3,6 @@
 <link rel="import" href="/bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="/bower_components/polymerfire/firebase-auth.html">
 
-<link rel="import" href="my-icon.html">
-<!--<link rel="import" href="pages/main-layout.html">-->
-<link rel="import" href="pages/app-login.html">
-<link rel="import" href="styles/shared-styles.html">
-
 <dom-module id="proyectos-app">
     <template>
         <style>
@@ -59,7 +54,6 @@
                 }
             }
             validaInfo(){
-              //valor del campo
               let valUse = this.$.datouser.value;
               let valPas = this.$.datopass.value;
               console.log("Este es el usuario capturado .." + valUse);
@@ -75,7 +69,7 @@
                   return;
                 }
               });
-              (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda.");
+              (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda, " + nombre);
 
 
             }
