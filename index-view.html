@@ -1,6 +1,6 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="formulario-crud.html">
 
 <dom-module id="index-view">
@@ -142,7 +142,8 @@ span{
         path="[[pathmodifica]]"
         data="{{lista}}">
     </firebase-query>
-    <!--<firebase-query
+    <!--
+    <firebase-query
         id="insert"
         app-name="agendascrum"
         path="/users/contactos"
@@ -154,6 +155,10 @@ span{
         path="/users/contactos"
         data="{{datos}}">
     </firebase-query>
+    -->
+    <div>
+        <button type="button" name="button" on-click="logout">Logout</button>
+    </div>
       <div class="container">
         <dom-repeat items="{{lista}}" as="item">
         <template>
@@ -162,7 +167,7 @@ span{
               <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
               <div class="card-body">
                 <h3 class="card-title">[[item.name]]</h3>
-                <p class="card-text">Telefono: [[item.tel]]</p>
+                <p class="card-text">Telefono: [[item.phone]]</p>
                 <p class="card-text">Correo Electronico: [[item.email]]</p>
                 <div >
                   <hr>
@@ -186,19 +191,20 @@ span{
       </div>
     <div id="contentmodal">
 
-
-
-    </template>
-    </dom-repeat>
-    <div>
-          <button type="button" name="button" on-click="agrega">AGREGA</button>
     </div>
 
 
   </template>
 
   <script>
-
+    /**
+     * `index-view`
+     *
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
     class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
@@ -227,7 +233,9 @@ span{
           datos: {
             type: Object,
             value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
-          }
+          },
+          pathmodifica: String,
+          key: String
 
         };
       }
@@ -246,32 +254,10 @@ span{
         this.$.contentmodal.innerHTML=`
           <formulario-crud disparador=true><formulario-crud>
         `
-            },
-            pathmodifica: String,
-            key: String
-        };
-      }
-      ready(){
-        super.ready();
-        console.log('Ejecutándose ready');
-        //console.log(this.key);
-        //this.pathModifica = '/users/usuario1/contactos' ;
-        //console.log(this.path-modifica);
-        //this.pathModifica = '/users/usuario1/contactos' ;
-        //this.pathModifica = '/users/'+prompt("ingresa usuario")+'/contactos' ;
 
       }
-      agrega(){
-            //instrucciones para alta de nuevos registros a firebase
-            console.log(this.$.personas.ref);
-            this.$.personas.ref.push({
-              id: 3,
-              email: "insert2@live.com",
-              name: "prueba insert1",
-              phone: "7224499243",
-              image: "ejemplo ruta:"
-            });
-
+      logout(){
+        window.location.href = 'http://127.0.0.1:8887/';
       }
 
   // ready(){
