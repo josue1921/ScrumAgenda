@@ -1,0 +1,116 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="/bower_components/polymerfire/firebase-auth.html">
+
+<link rel="import" href="my-icon.html">
+<!--<link rel="import" href="pages/main-layout.html">-->
+<link rel="import" href="pages/app-login.html">
+<link rel="import" href="styles/shared-styles.html">
+
+<dom-module id="proyectos-app">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                display: block;
+            }
+        </style>
+        <firebase-app
+            auth-domain="agendascrum.firebaseapp.com"
+            database-url="https://agendascrum.firebaseio.com"
+            api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
+            name="agendascrum">
+        </firebase-app>
+        <firebase-query
+            id="userAut"
+            app-name="agendascrum"
+            path="/users"
+            data="{{user}}">
+        </firebase-query>
+        <!-- SIGN IN -->
+        <div id="signin">
+          User: <input type="text" value="" id="datouser" />
+          Password: <input type="password" value="" id="datopass" />
+          <button type="button" on-click="validaInfo" name="button">Ingresar</button>
+        </div>
+
+        <!-- Main -->
+        <main-layout id="main"></main-layout>
+    </template>
+    <script>
+        class ProyectosApp extends Polymer.Element {
+            static get is() { return 'proyectos-app'; }
+            static get config() {
+                return {
+                    properties: {
+                        offline: {
+                            type: Boolean,
+                            value: false
+                        },
+                        user:{
+                            type: Object
+                        },
+                        statusKnown: {
+                            type: Object
+                        }
+                    },
+                }
+            }
+            validaInfo(){
+              //valor del campo
+              let valUse = this.$.datouser.value;
+              let valPas = this.$.datopass.value;
+              console.log("Este es el usuario capturado .." + valUse);
+              let bandera = 0;
+              let nombre = "";
+              this.user.forEach(function(element) {
+                let user = element.username;
+                let pass = element.password;
+                if (user === valUse && pass === valPas){
+                  console.log("Bienvenido si eres usuario.");
+                  nombre = element.name;
+                  bandera = 1
+                  return;
+                }
+              });
+              (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda.");
+
+
+            }
+            created(){
+                this.offline = navigator.onLine === false;
+            }
+            connectedCallback() {
+                super.connectedCallback();
+                requestAnimationFrame(this._installListeners.bind(this));
+            }
+            _installListeners() {
+                window.addEventListener('auth-changed', this._onAuthChanged.bind(this));
+                window.addEventListener('online', function () {
+                    this.offline = false;
+                }.bind(this));
+                window.addEventListener('offline', function () {
+                    this.offline = true;
+                }.bind(this));
+            }
+            _onAuthChanged(data){
+               var user = data.detail.user;
+               var el = this;
+               if(!!user){
+                   Polymer.Utils.importHref(
+                           this.resolveUrl('/pages/main-layout.html'), function(){
+                           el.$.signin.hidden = true;
+                           el.$.main.hidden = false;
+                          el.$.main.resizeHeader();
+                       });
+               }else{
+                   this.$.signin.hidden = false;
+                   this.$.main.hidden = true;
+               }
+            }
+        }
+        customElements.define(ProyectosApp.is, ProyectosApp);
+    </script>
+</dom-module>

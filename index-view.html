@@ -56,31 +56,41 @@
       }
     </style>
     <firebase-app
+        id="firebase"
         auth-domain="agendascrum.firebaseapp.com"
         database-url="https://agendascrum.firebaseio.com"
         api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
-        name="agendascrum"
-        storage-bucket="agendascrum.appspot.com"
-        messaging-sender-id="agendascrum">
+        name="agendascrum">
     </firebase-app>
     <firebase-query
         id="personas"
         app-name="agendascrum"
-        path="/personas"
+        path="/users/contactos"
         data="{{lista}}">
     </firebase-query>
-
-    <dom-repeat items="{{lista}}" as="item">
+    <firebase-query
+        id="insert"
+        app-name="agendascrum"
+        path="/users/contactos"
+        data="{{datos}}">
+    </firebase-query>
+    <firebase-query
+        id="remove"
+        app-name="agendascrum"
+        path="/users/contactos"
+        data="{{datos}}">
+    </firebase-query>
+    <dom-repeat items="[[lista]]" as="item" id="item">
     <template>
       <div class="column">
         <div class="card">
           <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
           <div class="card-body">
             <h3 class="card-title">[[item.name]]</h3>
-            <p class="card-text">Telefono: [[item.tel]]</p>
+            <p class="card-text">Telefono: [[item.phone]]</p>
             <p class="card-text">Correo Electronico: [[item.email]]</p>
-            <button type="button" name="button" class="btn-edit">Editar</button>
-            <button type="button" name="button" class="btn-delete">Eliminar</button>
+            <button type="button" class="btn-edit">Editar</button>
+            <button type="button" class="btn-delete" on-tap="remove" id="dele" value="[[item]]">Eliminar</button>
           </div>
         </div>
       </div>
@@ -100,32 +110,38 @@
      * @polymer
      * @demo demo/index.html
      */
-    class IndexView extends Polymer.Element {
+    class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
         return {
-          lista: {
-            type: Array,
-            value: [
-                  {
-                     "id":1,"nombre":"Jose Carlos", "telefono":"24234344256","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":2,"nombre":"Roberto", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":3,"nombre":"Pedro", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":4,"nombre":"Rodrigo", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":5,"nombre":"Alberto", "telefono":"23345689","correo":"correo@softtek.com"
-                  }
-            ]
+          datos: {
+            type: Object,
+            value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
           }
         };
       }
+      ready(){
+        super.ready();
+        console.log('Ejecutándose ready ');
+        //instrucciones para alta de nuevos registros a firebase
+        this.$.insert.ref.push({
+          id: 3,
+          email: "insert2@live.com",
+          name: "prueba insert1",
+          phone: "7224499243",
+          image: "ejemplo ruta:"
+        });
+
+      }
+      //instrucciones para la baja de un registro de firebase
+      //let key = e.currentTarget.item.$id;
+      // remove(e) {
+      //     //let val = this.$.dele.value;
+      //     //let val = e.path[0].value;
+      //     //let id = e.currentTarget.item.id;
+      //     let id = "persona2";
+      //     this.$.remove.ref.child(id).remove();
+      // }
     }
 
     window.customElements.define(IndexView.is, IndexView);
