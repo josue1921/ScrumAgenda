@@ -1,4 +1,7 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../file-input/image-input.html">
 
 <dom-module id="formulario-crud">
   <template>
@@ -7,8 +10,8 @@
           display: none; /* Hidden by default */
           position: fixed; /* Stay in place */
           z-index: 1; /* Sit on top */
-          padding-top: 100px; /* Location of the box */
-          left: 0;
+          padding-top: 80px; /* Location of the box */
+          left:0;
           top: 0;
           width: 100%; /* Full width */
           height: 100%; /* Full height */
@@ -45,7 +48,7 @@
 
         /* The Close Button */
         .close {
-          color: white;
+          color: black;
           float: right;
           font-size: 28px;
           font-weight: bold;
@@ -60,16 +63,66 @@
 
         .modal-header {
           padding: 2px 16px;
-          background-color: #5cb85c;
-          color: white;
+
         }
 
-        .modal-body {padding: 2px 16px;}
+        .modal-body {
+          padding: 2px 16px;
+        }
 
         .modal-footer {
           padding: 2px 16px;
-          background-color: #5cb85c;
-          color: white;
+
+        }
+        .separadorCampos{
+          width:95%;
+          display:inline-block;
+          padding:15px;
+
+        }
+        image-input.top-left {
+          --image-input-width: 300px;
+          --image-input-height: 180px;
+          --image-input-button: {
+            left: -16px;
+            top: -16px;
+            right: auto;
+            bottom: auto;
+            background-color:#acacac;
+          };
+          left:100px;
+          display: flex;
+           justify-content: center;
+        }
+        .btn-cancel{
+          background-color: #ff0000; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .btn-save{
+          background-color: #028107; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .div-buttons{
+          display:flex;
+          justify-content:space-between;
         }
     </style>
 
@@ -78,17 +131,31 @@
 
   <!-- Modal content -->
   <div class="modal-content">
-    <div class="modal-header">
-      <span class="close" on-click="cerrarModal">&times;</span>
-      <h2>Modal Header</h2>
+    <div class="modal-header" id="titleModal">
     </div>
     <div class="modal-body">
-      <p>Some text in the Modal Body</p>
-      <p>Some other text...</p>
-    </div>
-    <div class="modal-footer">
-      <h3>Modal Footer</h3>
-    </div>
+      <form action="">
+        <div class="separadorCampos">
+          <paper-input label="Nombre">
+            <iron-icon icon="account-circle" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Correo Electronico">
+            <iron-icon icon="mail" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Telefono">
+            <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
+          </paper-input>
+          <br>
+          <image-input class="top-left" position="center" preload fade placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAG1BMVEUAAAD///9/f38/Pz8fHx9fX1+/v7+fn5/f39+rr0+4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABWUlEQVRoge2TT2+CMBiHX6GoR5L5AYhu6pGEiNduYQlHIod5NNvsdjRmsqvb9Huv4CYVyp9l199zIPBr+7xt30AEAAAAAAAAAACAdhhO/fh4nU6pmdUg6L2xBkEDnVZlaggbBSZn7iJiQ5doNhkR3W3diMzJtSIweSrIs0sMxxjHWz9+JGsdLyPr6L0fKImXbjaafIjfSzxnZcEV9Z9PezVXfVltYGyI7fMdZAIlKwk21HVIrpTYvnwM0vengkDJSgKHehF1ObHZ0J6nlvTqdxQEXBGcsnrBeOTZISdrdSuE+DSFPH4uyLJ6gTwK2cbRm/IwHz4LQt3iS4E8JbP797KhHY2g00pg2Nldys+SQMmqBD2HHvbmq9gR+yLiBYGSVQmYSJw9EZuvyH9JNgWBklXCfirIdgeaYrpMj7bdf4Ad/rPav/Gm2n+mdfnFtqpfAAAAAAAAANCKb8w3PQYNl7XnAAAAAElFTkSuQmCC"></image-input>
+        </div>
+        <div class="modal-footer">
+          <hr>
+          <div class="div-buttons">
+            <button type="button" on-click="saveData" class="btn-save"><iron-icon icon="save" slot="prefix"></iron-icon>Guardar</button>
+            <button type="button" on-click="cerrarModal" class="btn-cancel"> <iron-icon icon="cancel" slot="prefix"></iron-icon>Cancelar</button>
+          </div>
+        </div>
+      </form>
   </div>
 
 </div>
@@ -111,6 +178,11 @@
           disparador: {
             type: Boolean,
             observer:"mostrarModal"
+          },
+          idselected:{
+            type:Number,
+            value:0,
+            observer:"mostrarDatos"
           }
         };
       }
@@ -125,6 +197,29 @@
       }
       cerrarModal(){
           this.$.myModal.style.display = "none";
+      }
+      mostrarDatos(){
+        let idseleccionado=this.get("idselected");
+        if(idseleccionado!=0){
+          var h2 = document.createElement("h3")
+          h2.innerHTML=`
+            Modificar : <strong>aqui poner el nombre del contacto a Modificar</strong>
+          `
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+        }else{
+          var h2 = document.createElement("h2")
+          h2.innerText="Crear Nuevo Contacto";
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+
+        }
       }
 
     }
