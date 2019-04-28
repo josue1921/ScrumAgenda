@@ -1,18 +1,66 @@
-<link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import" href="/bower_components/polymerfire/polymerfire.html">
-<link rel="import" href="/bower_components/paper-button/paper-button.html">
-<link rel="import" href="/bower_components/polymerfire/firebase-app.html">
-<link rel="import" href="/bower_components/polymerfire/firebase-auth.html">
-
-
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="register-user.html">
 <dom-module id="proyectos-app">
     <template>
         <style>
-            :host {
-                --app-primary-color: #4285f4;
-                --app-secondary-color: black;
-                display: block;
-            }
+          .box{
+          width: 300px;
+          border:1px solid #000000;
+          padding: 40px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          background-color:#798794;
+          border-radius: 15px;
+          text-align: center;
+          }
+          .box input[type="text"],.box input[type="password"]{
+            border:0;
+            /* background: none; */
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            border:1px solid #000000;
+            padding:14px 10px;
+            width:200px;
+            outline: none;
+            border-radius: 24px;
+            transition: 0.25s;
+          }
+          .box button{
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            border:1px solid #000000;
+            padding:14px 40px;
+            outline: none;
+            border-radius: 24px;
+            transition: 0.25s;
+            cursor: pointer;
+            background-color: white;
+          }
+          .box button:hover{
+            background: #00ebce;
+          }
+          .box input[type="text"]:focus,.box input[type="password"]:focus{
+            width: 280px;
+            /* border-color:#16a085; */
+          }
+
+          .box h1{
+            text-align: center;
+            color: white;
+            text-transform: uppercase;
+            font-weight: 500;
+          }
+          .box p{
+            color: white;
+          }
         </style>
         <firebase-app
             auth-domain="agendascrum.firebaseapp.com"
@@ -28,13 +76,15 @@
         </firebase-query>
         <!-- SIGN IN -->
         <div id="signin">
-          User: <input type="text" value="" id="datouser" />
-          Password: <input type="password" value="" id="datopass" />
-          <button type="button" on-click="validaInfo" name="button">Ingresar</button>
+          <form class="box" action="">
+              <h1>Agenda</h1>
+              <input type="text" name="username" placeholder="Username" value="" id="datouser" autocomplete="off">
+              <input type="password" name="password" value="" id="datopass" placeholder="Password">
+              <button type="button" on-click="validaInfo" name="button">Ingresar</button>
+              <button type="button" on-click="register" name="button">Registrarme</button>
+          </form>
         </div>
-
-        <!-- Main -->
-        <main-layout id="main"></main-layout>
+        <div id="contentmodal"></div>
     </template>
     <script>
         class ProyectosApp extends Polymer.Element {
@@ -59,58 +109,27 @@
               let valUse = this.$.datouser.value;
               let valPas = this.$.datopass.value;
               let padre;
-              console.log("Este es el usuario capturado .." + valUse);
               let bandera = 0;
               let nombre = "";
               this.user.forEach(function(element) {
                 let user = element.username;
                 let pass = element.password;
                 if (user === valUse && pass === valPas){
-                  console.log("Bienvenido si eres usuario.");
                   nombre = element.name;
                   bandera = 1;
                   padre = element.$key;
                   return;
                 }
               });
-              (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda, " + nombre);
-              document.getElementById('contenedor').innerHTML =`
-              <index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>
-              `;
-              //pathModifica='users/usuario1/contactos'
-              //document.getElementById('contenedor').innerHTML = "holacrayola";
-
+              if (bandera === 0) {
+                console.log("Lo sentimos no eres usuario de sistema.")
+              } else {
+                console.log("Hola " + nombre + ", bienvenido a tu agenda.");
+                document.getElementById('contenedor').innerHTML = `<index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>`;
+              }
             }
-            created(){
-                this.offline = navigator.onLine === false;
-            }
-            connectedCallback() {
-                super.connectedCallback();
-                requestAnimationFrame(this._installListeners.bind(this));
-            }
-            _installListeners() {
-                window.addEventListener('auth-changed', this._onAuthChanged.bind(this));
-                window.addEventListener('online', function () {
-                    this.offline = false;
-                }.bind(this));
-                window.addEventListener('offline', function () {
-                    this.offline = true;
-                }.bind(this));
-            }
-            _onAuthChanged(data){
-               var user = data.detail.user;
-               var el = this;
-               if(!!user){
-                   Polymer.Utils.importHref(
-                           this.resolveUrl('/pages/main-layout.html'), function(){
-                           el.$.signin.hidden = true;
-                           el.$.main.hidden = false;
-                          el.$.main.resizeHeader();
-                       });
-               }else{
-                   this.$.signin.hidden = false;
-                   this.$.main.hidden = true;
-               }
+            register(){
+              this.$.contentmodal.innerHTML=`<register-user disparador=true></register-user>`;
             }
         }
         customElements.define(ProyectosApp.is, ProyectosApp);

@@ -2,6 +2,7 @@
 <link rel="import" href="/bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="formulario-crud.html">
+<link rel="import" href="contact-update.html">
 
 <dom-module id="index-view">
   <template>
@@ -76,73 +77,76 @@
 
       }
 
-.contenedor{
-  width:90px;
-  height:240px;
-  position:fixed;
-  right:0px;
-  bottom:0px;
-}
-.botonF1{
-  width:60px;
-  height:60px;
-  border-radius:100%;
-  background:#0c661d;
-  right:0;
-  bottom:0;
-  position:absolute;
-  margin-right:16px;
-  margin-bottom:16px;
-  border:none;
-  outline:none;
-  color:#FFF;
-  font-size:36px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  transition:.3s;
-}
-span{
-  transition:.5s;
-}
-.botonF1:hover span{
-  transform:rotate(360deg);
-}
-.botonF1:active{
-  transform:scale(1.1);
-}
-.btn{
-  width:40px;
-  height:40px;
-  border-radius:100%;
-  border:none;
-  color:#FFF;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  font-size:28px;
-  outline:none;
-  position:absolute;
-  right:0;
-  bottom:0;
-  margin-right:26px;
-  transform:scale(0);
-}
-.animacionVer{
-  transform:scale(1);
-}
-
+      .contenedor{
+        width:90px;
+        height:240px;
+        position:fixed;
+        right:0px;
+        bottom:0px;
+      }
+      .botonF1{
+        width:60px;
+        height:60px;
+        border-radius:100%;
+        background:#0c661d;
+        right:0;
+        bottom:0;
+        position:absolute;
+        margin-right:16px;
+        margin-bottom:16px;
+        border:none;
+        outline:none;
+        color:#FFF;
+        font-size:36px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        transition:.3s;
+      }
+      span{
+        transition:.5s;
+      }
+      .botonF1:hover span{
+        transform:rotate(360deg);
+      }
+      .botonF1:active{
+        transform:scale(1.1);
+      }
+      .btn{
+        width:40px;
+        height:40px;
+        border-radius:100%;
+        border:none;
+        color:#FFF;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        font-size:28px;
+        outline:none;
+        position:absolute;
+        right:0;
+        bottom:0;
+        margin-right:26px;
+        transform:scale(0);
+      }
+      .animacionVer{
+        transform:scale(1);
+      }
     </style>
-    <firebase-app
-        id="firebase"
-        auth-domain="agendascrum.firebaseapp.com"
-        database-url="https://agendascrum.firebaseio.com"
-        api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
-        name="agendascrum">
-    </firebase-app>
     <firebase-query
-        id="personas"
+        id="users"
         app-name="agendascrum"
         path="[[pathmodifica]]"
         data="{{lista}}">
     </firebase-query>
-
+    <firebase-query
+        id="insert"
+        app-name="agendascrum"
+        path="[[pathmodifica]]"
+        data="{{datos}}">
+    </firebase-query>
+    <firebase-query
+        id="remove"
+        app-name="agendascrum"
+        path="[[pathmodifica]]"
+        data="{{datos}}">
+    </firebase-query>
     <div>
         <button type="button" name="button" on-click="logout">Logout</button>
     </div>
@@ -151,144 +155,85 @@ span{
         <template>
           <div >
             <div class="card">
-              <img src="../imgs/img_distros.jpg" class="card-img-top" alt="100%">
-              <div class="card-body">
+              <div class="card-body"><br>
                 <h3 class="card-title">[[item.name]]</h3>
+                <img src="[[item.image]]" class="card-img-top" alt="100%" height="200px" width="15px">
                 <p class="card-text">Telefono: [[item.phone]]</p>
-                <p class="card-text">Correo Electronico: [[item.email]]</p>
+                <!--<p class="card-text">Email: [[item.email]]</p>-->
                 <div >
                   <hr>
                   <div class="div-buttons">
-                    <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit" ><iron-icon icon="create" slot="prefix"></iron-icon>Editar</button>
-                    <button type="button" on-click="deleteData" data-item$="[[item.id]]"  class="btn-delete"> <iron-icon icon="delete" slot="prefix"></iron-icon>Eliminar</button>
+                    <button type="button" on-click="editData" data-item$="[[item.$key]]" class="btn-edit"><iron-icon icon="create" slot="prefix"></iron-icon>Editar</button>
+                    <button type="button" on-click="deleteData" data-item$="[[item.$key]]" class="btn-delete"> <iron-icon icon="delete" slot="prefix"></iron-icon>Eliminar</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
         </template>
         </dom-repeat>
-
-              <div class="contenedor">
-                  <button type="button" class="botonF1" title="Nuevo COntacto" on-click="newData">
-                    <span >+</span>
-                  </button>
-               </div>
+        <div class="contenedor">
+            <button type="button" class="botonF1" title="Nuevo Contacto" on-click="newData">
+              <span >+</span>
+            </button>
+        </div>
       </div>
-    <div id="contentmodal">
-
-    </div>
-
-
+    <div id="contentmodal"></div>
   </template>
-
   <script>
-
     class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
         return {
           lista: {
-            type: Array
+            type: Array,
+            value: [
+                  {
+                     "id":1,"nombre":"Jose Carlos", "telefono":"24234344256","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":2,"nombre":"Roberto", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":3,"nombre":"Pedro", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":4,"nombre":"Rodrigo", "telefono":"23345689","correo":"correo@softtek.com"
+                  },
+                  {
+                    "id":5,"nombre":"Alberto", "telefono":"23345689","correo":"correo@softtek.com"
+                  }
+            ]
           },
+          datos: Object,
           pathmodifica: String,
-          key: String,
-          datosmodifica: {
-                type: Object        //Aqui tenia array pero marca un error al bindearlo, dice que no puede bindear porque es un JSON
-          }
-
+          key: String
         };
       }
       deleteData(data){
-
-        let idBoton = data.currentTarget.dataset.item;                   //se recupera el id del registro seleccionado
-
-        this.lista.map((elemento)=>{                                     //recorre la lista de contactos
-             if(idBoton == elemento.id){                                //Si el elemento se encuentra se elimina
-                   this.$.personas.ref.child(elemento.$key).remove();
-                   return;
-             }
-      });
-
+        let opcion = confirm("Estas seguro de eliminar a tu contacto.");
+        if (opcion === true) {
+          let val = data.currentTarget.dataset.item;
+          this.$.remove.ref.child(val).remove();
+	      }
       }
       editData(data){
-        console.log(data.currentTarget.dataset.item);
-        let id=data.currentTarget.dataset.item;
+        let id = data.currentTarget.dataset.item;
+        console.log("Elemento a modificar: " + id);
         this.$.contentmodal.innerHTML=`
-          <formulario-crud disparador=true idselected=${id} datoshijo={{datosmodifica}}><formulario-crud>
-        `;
-      /*
-            datoshijo={{datosmodifica}  se supone que es el bindeo del hijo al padre
-      */
-        console.log("datos del padre: " + this.datosmodifica);          //Esto es la prueba para ver el bindeo pero sale como undefined
+          <contact-update disparador=true padre="${id}" pathmodifica= "${this.pathmodifica}" idselected="1"></contact-update>
+        `
       }
       newData(){
+        let val = this.key;
         this.$.contentmodal.innerHTML=`
-          <formulario-crud disparador=true><formulario-crud>
+          <formulario-crud disparador=true padre="${val}" pathmodifica= "${this.pathmodifica}"><formulario-crud>
         `
-
       }
       logout(){
         window.location.href = 'http://127.0.0.1:8887/';
       }
-
-/* funcion de base para recorrer la lista de contactos
-validaInfo(){
-  let valUse = this.$.datouser.value;
-  let valPas = this.$.datopass.value;
-  let padre;
-  console.log("Este es el usuario capturado .." + valUse);
-  let bandera = 0;
-  let nombre = "";
-  this.user.forEach(function(element) {
-   let user = element.username;
-   let pass = element.password;
-   if (user === valUse && pass === valPas){
-      console.log("Bienvenido si eres usuario.");
-      nombre = element.name;
-      bandera = 1;
-      padre = element.$key;
-      return;
-   }
-  });
-  (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda, " + nombre);
-  document.getElementById('contenedor').innerHTML =`
-  <index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>
-  `;
-  //pathModifica='users/usuario1/contactos'
-  //document.getElementById('contenedor').innerHTML = "holacrayola";
-
-}
-*/
-
-
-
-
-  // ready(){
-  //   super.ready();
-  //   console.log('Ejecutándose ready ');
-  //   //instrucciones para alta de nuevos registros a firebase
-  //   this.$.insert.ref.push({
-  //     id: 3,
-  //     email: "insert2@live.com",
-  //     name: "prueba insert1",
-  //     phone: "7224499243",
-  //     image: "ejemplo ruta:"
-  //   });
-  //
-  // }
-  //instrucciones para la baja de un registro de firebase
-  //let key = e.currentTarget.item.$id;
-  // remove(e) {
-  //     //let val = this.$.dele.value;
-  //     //let val = e.path[0].value;
-  //     //let id = e.currentTarget.item.id;
-  //     let id = "persona2";
-  //     this.$.remove.ref.child(id).remove();
-  // }
     }
-
     window.customElements.define(IndexView.is, IndexView);
   </script>
 </dom-module>

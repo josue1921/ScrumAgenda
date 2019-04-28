@@ -3,18 +3,12 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/file-input/image-input.html">
 
-<dom-module id="formulario-crud">
+<dom-module id="register-user">
   <template>
     <firebase-query
         id="insert"
         app-name="agendascrum"
-        path="[[pathmodifica]]"
-        data="{{datos}}">
-    </firebase-query>
-    <firebase-query
-        id="update"
-        app-name="agendascrum"
-        path="[[pathmodifica]]/[[padre]]"
+        path="/users"
         data="{{datos}}">
     </firebase-query>
     <style>
@@ -22,7 +16,7 @@
           display: none; /* Hidden by default */
           position: fixed; /* Stay in place */
           z-index: 1; /* Sit on top */
-          padding-top: 80px; /* Location of the box */
+          padding-top: 20px; /* Location of the box */
           left:0;
           top: 0;
           width: 100%; /* Full width */
@@ -30,6 +24,7 @@
           overflow: auto; /* Enable scroll if needed */
           background-color: rgb(0,0,0); /* Fallback color */
           background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+          border-radius: 10px 10px 10px 10px;
         }
 
         /* Modal Content */
@@ -39,7 +34,7 @@
           margin: auto;
           padding: 0;
           border: 1px solid #888;
-          width: 40%;
+          width: 30%;
           box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
           -webkit-animation-name: animatetop;
           -webkit-animation-duration: 0.4s;
@@ -76,7 +71,6 @@
 
         .modal-header {
           padding: 2px 16px;
-
         }
 
         .modal-body {
@@ -85,13 +79,11 @@
 
         .modal-footer {
           padding: 2px 16px;
-
         }
         .separadorCampos{
           width:95%;
           display:inline-block;
           padding:15px;
-
         }
         image-input.top-left {
           --image-input-width: 300px;
@@ -155,8 +147,14 @@
           <paper-input label="Telefono" id="phone">
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
+          <paper-input label="Username" id="usrname">
+            <iron-icon icon="perm-identity" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Password" id="passw">
+            <iron-icon icon="lock" slot="prefix"></iron-icon>
+          </paper-input>
           <br>
-          <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]"></image-input>
+          <image-input class="top-left" position="center" id="img" preload fade placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAG1BMVEUAAAD///9/f38/Pz8fHx9fX1+/v7+fn5/f39+rr0+4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABWUlEQVRoge2TT2+CMBiHX6GoR5L5AYhu6pGEiNduYQlHIod5NNvsdjRmsqvb9Huv4CYVyp9l199zIPBr+7xt30AEAAAAAAAAAACAdhhO/fh4nU6pmdUg6L2xBkEDnVZlaggbBSZn7iJiQ5doNhkR3W3diMzJtSIweSrIs0sMxxjHWz9+JGsdLyPr6L0fKImXbjaafIjfSzxnZcEV9Z9PezVXfVltYGyI7fMdZAIlKwk21HVIrpTYvnwM0vengkDJSgKHehF1ObHZ0J6nlvTqdxQEXBGcsnrBeOTZISdrdSuE+DSFPH4uyLJ6gTwK2cbRm/IwHz4LQt3iS4E8JbP797KhHY2g00pg2Nldys+SQMmqBD2HHvbmq9gR+yLiBYGSVQmYSJw9EZuvyH9JNgWBklXCfirIdgeaYrpMj7bdf4Ad/rPav/Gm2n+mdfnFtqpfAAAAAAAAANCKb8w3PQYNl7XnAAAAAElFTkSuQmCC"></image-input>
         </div>
         <div class="modal-footer">
           <hr>
@@ -170,8 +168,8 @@
   </div>
   </template>
   <script>
-    class FormularioCrud extends Polymer.Element {
-      static get is() { return 'formulario-crud'; }
+    class RegisterUser extends Polymer.Element {
+      static get is() { return 'register-user'; }
       static get properties() {
         return {
           disparador: {
@@ -183,30 +181,21 @@
             value:0,
             observer:"mostrarDatos"
           },
-          accion: Number,
           padre: String,
           pathmodifica: String,
-          datos: Object,
-          imagen: String
+          datos: Object
         };
       }
       saveData(){
-        if (this.accion === 0) {
-          let imgSele = "";
-          let selec = this.$.img.value ;
-          if(this.$.img.value == undefined) {
-            imgSele = "C:/ScrumAgenda/imgs/user.png";
-          }else {
-            imgSele = this.$.img.value;
-          }
-          this.$.insert.ref.push({
-              email: this.$.email.value,
-              name: this.$.name.value,
-              phone: this.$.phone.value,
-              image: imgSele
-          });
-          this.$.myModal.style.display = "none";
-        }
+        this.$.insert.ref.push({
+          email: this.$.email.value,
+          name: this.$.name.value,
+          phone: this.$.phone.value,
+          username: this.$.usrname.value,
+          password: this.$.passw.value,
+          image: ("C:/ScrumAgenda/imgs/contacts/" + this.$.img.value)
+        });
+      this.$.myModal.style.display = "none";
       }
       mostrarModal(){
         let disp=this.get('disparador');
@@ -221,16 +210,28 @@
           this.$.myModal.style.display = "none";
       }
       mostrarDatos(){
-          let idseleccionado=this.idselected;
-          var h2 = document.createElement("h2")
-          this.accion = 0;
-          h2.innerText="Crear Nuevo Contacto";
+        let idseleccionado=this.get("idselected");
+        if(idseleccionado!=0){
+          var h2 = document.createElement("h3")
+          h2.innerHTML=`<strong>Contacto</strong>  `
           h2.style=" text-align: center;"
           var hr = document.createElement("hr");
           this.$.titleModal.appendChild(h2)
           this.$.titleModal.appendChild(hr)
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+        }else{
+          var h2 = document.createElement("h2")
+          h2.innerText="Registrarme";
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+
+        }
       }
+
     }
-    window.customElements.define(FormularioCrud.is, FormularioCrud);
+    window.customElements.define(RegisterUser.is, RegisterUser);
   </script>
 </dom-module>

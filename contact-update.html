@@ -3,14 +3,8 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/file-input/image-input.html">
 
-<dom-module id="formulario-crud">
+<dom-module id="contact-update">
   <template>
-    <firebase-query
-        id="insert"
-        app-name="agendascrum"
-        path="[[pathmodifica]]"
-        data="{{datos}}">
-    </firebase-query>
     <firebase-query
         id="update"
         app-name="agendascrum"
@@ -22,7 +16,7 @@
           display: none; /* Hidden by default */
           position: fixed; /* Stay in place */
           z-index: 1; /* Sit on top */
-          padding-top: 80px; /* Location of the box */
+          padding-top: 20px; /* Location of the box */
           left:0;
           top: 0;
           width: 100%; /* Full width */
@@ -30,6 +24,7 @@
           overflow: auto; /* Enable scroll if needed */
           background-color: rgb(0,0,0); /* Fallback color */
           background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+          border-radius: 10px 10px 10px 10px;
         }
 
         /* Modal Content */
@@ -39,7 +34,7 @@
           margin: auto;
           padding: 0;
           border: 1px solid #888;
-          width: 40%;
+          width: 30%;
           box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
           -webkit-animation-name: animatetop;
           -webkit-animation-duration: 0.4s;
@@ -78,14 +73,11 @@
           padding: 2px 16px;
 
         }
-
         .modal-body {
           padding: 2px 16px;
         }
-
         .modal-footer {
           padding: 2px 16px;
-
         }
         .separadorCampos{
           width:95%;
@@ -170,8 +162,8 @@
   </div>
   </template>
   <script>
-    class FormularioCrud extends Polymer.Element {
-      static get is() { return 'formulario-crud'; }
+    class ContactUpdate extends Polymer.Element {
+      static get is() { return 'contact-update'; }
       static get properties() {
         return {
           disparador: {
@@ -191,22 +183,19 @@
         };
       }
       saveData(){
-        if (this.accion === 0) {
-          let imgSele = "";
-          let selec = this.$.img.value ;
-          if(this.$.img.value == undefined) {
-            imgSele = "C:/ScrumAgenda/imgs/user.png";
-          }else {
-            imgSele = this.$.img.value;
-          }
-          this.$.insert.ref.push({
-              email: this.$.email.value,
-              name: this.$.name.value,
-              phone: this.$.phone.value,
-              image: imgSele
-          });
-          this.$.myModal.style.display = "none";
+        console.log("Registro a afectar: " + this.pathmodifica + "/" + this.padre);
+        let imgSele = "";
+        if(this.$.img.value == "") {
+          imgSele = "C:/ScrumAgenda/imgs/user.png";
+        }else {
+          imgSele = this.$.img.value;
         }
+        this.$.update.ref.update({
+          email: this.$.email.value,
+          name: this.$.name.value,
+          phone: this.$.phone.value,
+          image: imgSele
+        });
       }
       mostrarModal(){
         let disp=this.get('disparador');
@@ -221,16 +210,25 @@
           this.$.myModal.style.display = "none";
       }
       mostrarDatos(){
-          let idseleccionado=this.idselected;
-          var h2 = document.createElement("h2")
-          this.accion = 0;
-          h2.innerText="Crear Nuevo Contacto";
+        let idseleccionado=this.idselected;
+        if(idseleccionado!=0){
+          let datos = this.datos;
+          this.accion = 1;
+          var h2 = document.createElement("h3")
+          h2.innerHTML=`Modificar : <strong>aqui poner el nombre del contacto a Modificar</strong>`
           h2.style=" text-align: center;"
           var hr = document.createElement("hr");
           this.$.titleModal.appendChild(h2)
           this.$.titleModal.appendChild(hr)
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+          this.$.name.value = this.datos[2].$val;
+          this.imagen = this.datos[1].$val;
+          this.$.email.value = this.datos[0].$val;
+          this.$.phone.value = this.datos[3].$val;
+        }
       }
     }
-    window.customElements.define(FormularioCrud.is, FormularioCrud);
+    window.customElements.define(ContactUpdate.is, ContactUpdate);
   </script>
 </dom-module>
