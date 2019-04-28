@@ -136,13 +136,13 @@
     <div class="modal-body">
       <form action="">
         <div class="separadorCampos">
-          <paper-input label="Nombre">
+          <paper-input label="Nombre" id="etiquetaNombre">
             <iron-icon icon="account-circle" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Correo Electronico">
+          <paper-input label="Correo Electronico" id="etiquetaCorreo">
             <iron-icon icon="mail" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Telefono">
+          <paper-input label="Telefono" id="etiquetaTelefono">
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
           <br>
@@ -183,8 +183,33 @@
             type:Number,
             value:0,
             observer:"mostrarDatos"
-          }
+            },
+            datoshijo:{                   //decaro los datos que quiero bindear a padre
+                  type: Array,
+                  notify: true            //Se supone que con eso ya se bndea
+            }
+            //nombre:String
+            //value: "valorPordefecto"
+
         };
+      }
+      saveData(){
+            //Se cahcan las variables para hacer mas entendible el codigo
+            let nombre = this.$.etiquetaNombre.value;
+            let correo = this.$.etiquetaCorreo.value;
+            let telefono = this.$.etiquetaTelefono.value;
+
+            this.set('datoshijo', [nombre, correo, telefono]);  // agrego los datos al objeto para pasarlo
+
+            //this.datoshijo = [this.$.etiquetaNombre.value, this.$.etiquetaCorreo.value, this.$.etiquetaTelefono.value];
+            console.log("son datos del hijo" + this.datoshijo);   //prueba para ver que es lo que regresa
+            //bojTemp.push();
+
+            /*
+            this.nombre = this.$.etiquetaNombre.value;
+            console.log(this.nombre);
+            */
+
       }
       mostrarModal(){
         let disp=this.get('disparador');

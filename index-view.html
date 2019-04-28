@@ -142,20 +142,7 @@ span{
         path="[[pathmodifica]]"
         data="{{lista}}">
     </firebase-query>
-    <!--
-    <firebase-query
-        id="insert"
-        app-name="agendascrum"
-        path="/users/contactos"
-        data="{{datos}}">
-    </firebase-query>
-    <firebase-query
-        id="remove"
-        app-name="agendascrum"
-        path="/users/contactos"
-        data="{{datos}}">
-    </firebase-query>
-    -->
+
     <div>
         <button type="button" name="button" on-click="logout">Logout</button>
     </div>
@@ -172,7 +159,7 @@ span{
                 <div >
                   <hr>
                   <div class="div-buttons">
-                    <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit"><iron-icon icon="create" slot="prefix"></iron-icon>Editar</button>
+                    <button type="button" on-click="editData" data-item$="[[item.id]]" class="btn-edit" ><iron-icon icon="create" slot="prefix"></iron-icon>Editar</button>
                     <button type="button" on-click="deleteData" data-item$="[[item.id]]"  class="btn-delete"> <iron-icon icon="delete" slot="prefix"></iron-icon>Eliminar</button>
                   </div>
                 </div>
@@ -183,11 +170,11 @@ span{
         </template>
         </dom-repeat>
 
-        <div class="contenedor">
-            <button type="button" class="botonF1" title="Nuevo COntacto" on-click="newData">
-              <span >+</span>
-            </button>
-         </div>
+              <div class="contenedor">
+                  <button type="button" class="botonF1" title="Nuevo COntacto" on-click="newData">
+                    <span >+</span>
+                  </button>
+               </div>
       </div>
     <div id="contentmodal">
 
@@ -197,58 +184,44 @@ span{
   </template>
 
   <script>
-    /**
-     * `index-view`
-     *
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
+
     class IndexView extends Polymer.GestureEventListeners(Polymer.Element) {
       static get is() { return 'index-view'; }
       static get properties() {
         return {
           lista: {
-            type: Array,
-            value: [
-                  {
-                     "id":1,"nombre":"Jose Carlos", "telefono":"24234344256","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":2,"nombre":"Roberto", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":3,"nombre":"Pedro", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":4,"nombre":"Rodrigo", "telefono":"23345689","correo":"correo@softtek.com"
-                  },
-                  {
-                    "id":5,"nombre":"Alberto", "telefono":"23345689","correo":"correo@softtek.com"
-                  }
-
-            ]
-          },
-          datos: {
-            type: Object,
-            value: { "id":9 ,"nombre":"Prueba INSERT", "telefono": "7224344256","correo":"ejemplo@softtek.com" }
+            type: Array
           },
           pathmodifica: String,
-          key: String
+          key: String,
+          datosmodifica: {
+                type: Object        //Aqui tenia array pero marca un error al bindearlo, dice que no puede bindear porque es un JSON
+          }
 
         };
       }
       deleteData(data){
-        //se recupera el id del registro seleccionado
-        console.log(data.target.dataset.item);
+
+        let idBoton = data.currentTarget.dataset.item;                   //se recupera el id del registro seleccionado
+
+        this.lista.map((elemento)=>{                                     //recorre la lista de contactos
+             if(idBoton == elemento.id){                                //Si el elemento se encuentra se elimina
+                   this.$.personas.ref.child(elemento.$key).remove();
+                   return;
+             }
+      });
+
       }
       editData(data){
-        console.log(data.target.dataset.item);
-        let id=data.target.dataset.item;
+        console.log(data.currentTarget.dataset.item);
+        let id=data.currentTarget.dataset.item;
         this.$.contentmodal.innerHTML=`
-          <formulario-crud disparador=true idselected=${id}><formulario-crud>
-        `
+          <formulario-crud disparador=true idselected=${id} datoshijo={{datosmodifica}}><formulario-crud>
+        `;
+      /*
+            datoshijo={{datosmodifica}  se supone que es el bindeo del hijo al padre
+      */
+        console.log("datos del padre: " + this.datosmodifica);          //Esto es la prueba para ver el bindeo pero sale como undefined
       }
       newData(){
         this.$.contentmodal.innerHTML=`
@@ -259,6 +232,38 @@ span{
       logout(){
         window.location.href = 'http://127.0.0.1:8887/';
       }
+
+/* funcion de base para recorrer la lista de contactos
+validaInfo(){
+  let valUse = this.$.datouser.value;
+  let valPas = this.$.datopass.value;
+  let padre;
+  console.log("Este es el usuario capturado .." + valUse);
+  let bandera = 0;
+  let nombre = "";
+  this.user.forEach(function(element) {
+   let user = element.username;
+   let pass = element.password;
+   if (user === valUse && pass === valPas){
+      console.log("Bienvenido si eres usuario.");
+      nombre = element.name;
+      bandera = 1;
+      padre = element.$key;
+      return;
+   }
+  });
+  (bandera === 0) ? console.log("Lo sentimos no eres usuario de sistema.") : console.log("Hola " + nombre + ", bienvenido a tu agenda, " + nombre);
+  document.getElementById('contenedor').innerHTML =`
+  <index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>
+  `;
+  //pathModifica='users/usuario1/contactos'
+  //document.getElementById('contenedor').innerHTML = "holacrayola";
+
+}
+*/
+
+
+
 
   // ready(){
   //   super.ready();
