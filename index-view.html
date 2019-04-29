@@ -8,7 +8,7 @@
   <template>
     <style>
       .btn-edit{
-        background-color: #64d3fc;
+       background-color: #64d3fc;
        border: none;
        border-radius:8px;
        color: white;
@@ -76,7 +76,6 @@
         flex-wrap:wrap;
 
       }
-
       .contenedor{
         width:90px;
         height:240px;
@@ -104,7 +103,7 @@
       span{
         transition:.5s;
       }
-      .botonF1:hover span{
+      .botonF1: hover span{
         transform:rotate(360deg);
       }
       .botonF1:active{
@@ -128,6 +127,31 @@
       .animacionVer{
         transform:scale(1);
       }
+      .tab-index{
+      background-color:#D0D2D5;
+      margin:10px;
+      padding:8px;
+      width: 100%;
+      border:1px solid #000000;
+      border-radius:5px;
+      color: white
+    }
+    .btn-out{
+      background-color: #15c100;
+     border: none;
+     border-radius:8px;
+     color: white;
+     padding: 8px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 12px;
+     margin: 4px 2px;
+     cursor: pointer;
+    }
+    .btn-out:hover{
+      border:1px solid #000000;
+    }
     </style>
     <firebase-query
         id="users"
@@ -147,8 +171,9 @@
         path="[[pathmodifica]]"
         data="{{datos}}">
     </firebase-query>
-    <div>
-        <button type="button" name="button" on-click="logout">Logout</button>
+    <div class="tab-index">
+      <h3><img src="[[perfil]]" height="80px" width="80px"> Bienvenido [[nombre]], a tu agenda de contactos.</h3>
+      <button class="btn-out" name="button" on-click="logout">Cerrar Sesión</button>
     </div>
       <div class="container">
         <dom-repeat items="{{lista}}" as="item">
@@ -207,7 +232,10 @@
           },
           datos: Object,
           pathmodifica: String,
-          key: String
+          key: String,
+          nombre: String,
+          perfil: String,
+          mail: String
         };
       }
       deleteData(data){

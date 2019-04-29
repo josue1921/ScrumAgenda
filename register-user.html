@@ -138,23 +138,23 @@
     <div class="modal-body">
       <form action="">
         <div class="separadorCampos">
-          <paper-input label="Nombre" id="name">
+          <paper-input label="Nombre" id="name" auto-validate pattern="[a-zA-z\s]{1,}" allowed-pattern="[a-zA-Z\s]" required="true">
             <iron-icon icon="account-circle" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Correo Electronico" id="email">
+          <paper-input label="Correo Electronico" id="email" auto-validate pattern="^([a-z]+[a-z1-9._-]*)@{1}([a-z1-9\.]{2,})\.([a-z]{2,3})" allowed-pattern="[a-zA-z0-9@.]" error-message="Correo no valido" required="true">
             <iron-icon icon="mail" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Telefono" id="phone">
+          <paper-input label="Telefono" id="phone" auto-validate allowed-pattern="[0-9]" pattern="(\d){10}" error-message="Numero no valido" required="true">
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Username" id="usrname">
+          <paper-input label="Username" id="usrname" auto-validate pattern="^[a-z]+[a-z5-9._-]" allowed-pattern="[a-zA-Z0-9]" error-message="Usuario debe estar formado por letras y al menos un numero." required="true">
             <iron-icon icon="perm-identity" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Password" id="passw">
+          <paper-input label="Password" id="passw" auto-validate pattern="[A-Za-z0-9]{6,}" allowed-pattern="[a-zA-Z0-9]" error-message="Constraseña debe estar formado por letras, numeros y minimo 6 caracteres." required="true">
             <iron-icon icon="lock" slot="prefix"></iron-icon>
           </paper-input>
           <br>
-          <image-input class="top-left" position="center" id="img" preload fade placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAG1BMVEUAAAD///9/f38/Pz8fHx9fX1+/v7+fn5/f39+rr0+4AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABWUlEQVRoge2TT2+CMBiHX6GoR5L5AYhu6pGEiNduYQlHIod5NNvsdjRmsqvb9Huv4CYVyp9l199zIPBr+7xt30AEAAAAAAAAAACAdhhO/fh4nU6pmdUg6L2xBkEDnVZlaggbBSZn7iJiQ5doNhkR3W3diMzJtSIweSrIs0sMxxjHWz9+JGsdLyPr6L0fKImXbjaafIjfSzxnZcEV9Z9PezVXfVltYGyI7fMdZAIlKwk21HVIrpTYvnwM0vengkDJSgKHehF1ObHZ0J6nlvTqdxQEXBGcsnrBeOTZISdrdSuE+DSFPH4uyLJ6gTwK2cbRm/IwHz4LQt3iS4E8JbP797KhHY2g00pg2Nldys+SQMmqBD2HHvbmq9gR+yLiBYGSVQmYSJw9EZuvyH9JNgWBklXCfirIdgeaYrpMj7bdf4Ad/rPav/Gm2n+mdfnFtqpfAAAAAAAAANCKb8w3PQYNl7XnAAAAAElFTkSuQmCC"></image-input>
+          <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]"></image-input>
         </div>
         <div class="modal-footer">
           <hr>
@@ -183,19 +183,35 @@
           },
           padre: String,
           pathmodifica: String,
-          datos: Object
+          datos: Object,
+          imagen: String,
+          success: Boolean
         };
       }
       saveData(){
-        this.$.insert.ref.push({
-          email: this.$.email.value,
-          name: this.$.name.value,
-          phone: this.$.phone.value,
-          username: this.$.usrname.value,
-          password: this.$.passw.value,
-          image: ("C:/ScrumAgenda/imgs/contacts/" + this.$.img.value)
-        });
-      this.$.myModal.style.display = "none";
+        if (this._validateDataForm()){
+          if (this.$.img.value == undefined){
+              this.imagen = "../imgs/user.png";
+          } else {
+              this.imagen = "../imgs/user.png";
+          }
+          this.$.insert.ref.push({
+            email: this.$.email.value,
+            name: this.$.name.value,
+            phone: this.$.phone.value,
+            username: this.$.usrname.value,
+            password: this.$.passw.value,
+            image: this.imagen
+          });
+          alert("Registro exitoso");
+          this.$.myModal.style.display = "none";
+        }
+      }
+      _validateDataForm(){
+           if(this.$.name.validate() && this.$.email.validate() && this.$.phone.validate() && this.$.usrname.validate() && this.$.passw.validate())
+                 return true;
+          alert("Introduce datos validos para guardar");
+                 return false;
       }
       mostrarModal(){
         let disp=this.get('disparador');
@@ -227,10 +243,8 @@
           var hr = document.createElement("hr");
           this.$.titleModal.appendChild(h2)
           this.$.titleModal.appendChild(hr)
-
         }
       }
-
     }
     window.customElements.define(RegisterUser.is, RegisterUser);
   </script>

@@ -108,24 +108,26 @@
             validaInfo(){
               let valUse = this.$.datouser.value;
               let valPas = this.$.datopass.value;
-              let padre;
+              let padre,email,perfil;
               let bandera = 0;
               let nombre = "";
               this.user.forEach(function(element) {
                 let user = element.username;
                 let pass = element.password;
                 if (user === valUse && pass === valPas){
-                  nombre = element.name;
-                  bandera = 1;
-                  padre = element.$key;
-                  return;
+                    nombre = element.name;
+                    email = element.email;
+                    perfil = element.image;
+                    padre = element.$key;
+                    bandera = 1;
+                    return;
                 }
               });
               if (bandera === 0) {
-                console.log("Lo sentimos no eres usuario de sistema.")
+                alert("Usuario no registrado.");
               } else {
                 console.log("Hola " + nombre + ", bienvenido a tu agenda.");
-                document.getElementById('contenedor').innerHTML = `<index-view pathmodifica="users/${padre}/contactos" key="${padre}"></index-view>`;
+                document.getElementById('contenedor').innerHTML = `<index-view pathmodifica="users/${padre}/contactos" key="${padre}" nombre="${nombre}" mail="${email}" perfil="${perfil}" ></index-view>`;
               }
             }
             register(){
