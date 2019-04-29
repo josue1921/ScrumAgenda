@@ -138,13 +138,13 @@
     <div class="modal-body">
       <form action="">
         <div class="separadorCampos">
-          <paper-input label="Nombre" id="name">
+          <paper-input label="Nombre" id="name" auto-validate pattern="[a-zA-z]{1,}" allowed-pattern="[a-zA-Z ]" required="true">
             <iron-icon icon="account-circle" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Correo Electronico" id="email">
+          <paper-input label="Correo Electronico" id="email" auto-validate pattern="^([a-zA-z]{1,})@([a-zA-z]{1,})\.([a-zA-z]{1,})" allowed-pattern="[a-zA-z@.]" error-message="Correo invalido" required="true">
             <iron-icon icon="mail" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Telefono" id="phone">
+          <paper-input label="Telefono" id="phone" auto-validate allowed-pattern="[0-9]" pattern="(\d){10}" error-message="Numero invaido" required="true">
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
           <br>
@@ -183,6 +183,8 @@
         };
       }
       saveData(){
+            if(!this.validaciones())
+                  return;
         console.log("Registro a afectar: " + this.pathmodifica + "/" + this.padre);
         let imgSele = "";
         if(this.$.img.value == "") {
@@ -196,6 +198,13 @@
           phone: this.$.phone.value,
           image: imgSele
         });
+      }
+      validaciones(){
+            
+           if(this.$.name.validate() && this.$.email.validate() && this.$.phone.validate())
+                 return true;
+          alert("Introduce datos validos para guardar");
+           return false;
       }
       mostrarModal(){
         let disp=this.get('disparador');

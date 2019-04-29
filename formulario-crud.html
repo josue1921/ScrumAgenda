@@ -146,13 +146,13 @@
     <div class="modal-body">
       <form action="">
         <div class="separadorCampos">
-          <paper-input label="Nombre" id="name">
+          <paper-input label="Nombre" id="name" auto-validate pattern="[a-zA-z]{1,}" allowed-pattern="[a-zA-Z ]" required="true">
             <iron-icon icon="account-circle" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Correo Electronico" id="email">
+          <paper-input label="Correo Electronico" id="email" auto-validate pattern="^([a-zA-z]{1,})@([a-zA-z]{1,})\.([a-zA-z]{1,})" allowed-pattern="[a-zA-z@.]" error-message="Correo invalido" required="true">
             <iron-icon icon="mail" slot="prefix"></iron-icon>
           </paper-input>
-          <paper-input label="Telefono" id="phone">
+          <paper-input label="Telefono" id="phone" auto-validate allowed-pattern="[0-9]" pattern="(\d){10}" error-message="Numero invaido" required="true">
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
           <br>
@@ -190,8 +190,10 @@
           imagen: String
         };
       }
+
       saveData(){
-        if (this.accion === 0) {
+
+        if (this.accion === 0 && this.validaciones()) {
           let imgSele = "";
           let selec = this.$.img.value ;
           if(this.$.img.value == undefined) {
@@ -207,6 +209,12 @@
           });
           this.$.myModal.style.display = "none";
         }
+      }
+      validaciones(){
+           if(this.$.name.validate() && this.$.email.validate() && this.$.phone.validate())
+                 return true;
+          alert("Introduce datos validos para guardar");
+           return false;
       }
       mostrarModal(){
         let disp=this.get('disparador');
@@ -231,6 +239,9 @@
           this.$.titleModal.appendChild(hr)
       }
     }
+
+
+
     window.customElements.define(FormularioCrud.is, FormularioCrud);
   </script>
 </dom-module>
