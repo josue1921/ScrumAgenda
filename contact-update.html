@@ -148,7 +148,7 @@
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
           <br>
-          <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]"></image-input>
+          <image-input class="top-left" position="center" id="img" preload fade placeholder="../imgs/[[imagen]]"></image-input>
         </div>
         <div class="modal-footer">
           <hr>
@@ -179,7 +179,7 @@
           padre: String,
           pathmodifica: String,
           datos: Object,
-          imagen: String
+          imagen: {type: String}
         };
       }
       saveData(){
@@ -189,7 +189,12 @@
         if(this.$.img.value == "") {
           imgSele = "../imgs/user.png";
         }else {
-          imgSele = "../imgs/user.png";
+          if (this.$.img.value.name === undefined){
+            imgSele = this._parseoImagen(this.$.img.value);
+          }else {
+            imgSele = this.$.img.value.name;
+          }
+
         }
         this.$.update.ref.update({
           email: this.$.email.value,
@@ -199,6 +204,11 @@
         });
         alert("Modificación Exitosa");
         this.cerrarModal();
+      }
+      _parseoImagen(dato) {
+        let filename = dato.replace(/^.*[\\\/]/, '');
+        console.log(filename);
+        return filename;
       }
       validaciones(){
           if(this.$.name.validate() && this.$.email.validate() && this.$.phone.validate())

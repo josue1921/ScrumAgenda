@@ -176,7 +176,7 @@
         data="{{datos}}">
     </firebase-query>
     <div class="tab-index">
-      <img src="[[perfil]]" height="60px" width="70px" style="padding:1px;"><h3> Bienvenido [[nombre]], a tu agenda de contactos.</h3>
+      <img src="../imgs/[[perfil]]" height="60px" width="70px" style="padding:1px;"><h3> Bienvenido [[nombre]], a tu agenda de contactos.</h3>
       <button class="btn-out" name="button" on-click="logout">Cerrar Sesión</button>
     </div>
       <div class="container">
@@ -186,8 +186,8 @@
             <div class="card">
               <div class="card-body"><br>
                 <h3 class="card-title">[[item.name]]</h3>
-                <img src="[[item.image]]" class="card-img-top" on-click="_contactInfo" data-item$="[[item.$key]]" alt="100%" height="200px" width="15px">
-                <p class="card-text">Telefono: [[item.phone]]</p>
+                <img src="../imgs/[[item.image]]" class="card-img-top" on-click="_contactInfo" data-item$="[[item.$key]]" alt="100%" height="200px" width="15px">
+                <p class="card-text"><h3>Telefono: [[item.phone]]</h3></p>
                 <!--<p class="card-text">Email: [[item.email]]</p>-->
                 <div >
                   <hr>

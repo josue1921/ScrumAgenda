@@ -156,7 +156,7 @@
             <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
           </paper-input>
           <br>
-          <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]"></image-input>
+          <image-input class="top-left" position="center" id="img" preload fade placeholder="../imgs/[[imagen]]"></image-input>
         </div>
         <div class="modal-footer">
           <hr>
@@ -195,9 +195,13 @@
           let imgSele = "";
           let selec = this.$.img.value ;
           if(this.$.img.value == undefined) {
-            imgSele = "../imgs/user.png";
+            imgSele = "user.png";
           }else {
-            imgSele = "../imgs/user.png";
+            if (this.$.img.value === "../imgs/") {
+                imgSele = "user.png";
+            }else {
+            imgSele = this.$.img.value.name;
+            }
           }
           this.$.insert.ref.push({
               email: this.$.email.value,
@@ -206,6 +210,7 @@
               image: imgSele
           });
           this.$.myModal.style.display = "none";
+          alert("Registro exitoso");
         }
       }
       validaciones(){

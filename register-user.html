@@ -193,7 +193,7 @@
           if (this.$.img.value == undefined){
               this.imagen = "../imgs/user.png";
           } else {
-              this.imagen = "../imgs/user.png";
+              this.imagen = this.$.img.value.name;
           }
           this.$.insert.ref.push({
             email: this.$.email.value,

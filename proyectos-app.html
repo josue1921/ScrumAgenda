@@ -66,6 +66,7 @@
             auth-domain="agendascrum.firebaseapp.com"
             database-url="https://agendascrum.firebaseio.com"
             api-key="y8eZHkWa8LSs43oKDaQsTyP02pBUSPso60Rwij9G"
+            storage-bucket="agendascrum.appspot.com/imagenes"
             name="agendascrum">
         </firebase-app>
         <firebase-query
@@ -77,7 +78,7 @@
         <!-- SIGN IN -->
         <div id="signin">
           <form class="box" action="">
-              <h1>Agenda</h1>
+              <h1>Login Agenda</h1>
               <input type="text" name="username" placeholder="Username" value="" id="datouser" autocomplete="off">
               <input type="password" name="password" value="" id="datopass" placeholder="Password">
               <button type="button" on-click="validaInfo" name="button">Ingresar</button>
@@ -117,7 +118,7 @@
                 }
               });
               if (bandera === 0) {
-                alert("Usuario no registrado.");
+                alert("Datos no validos o usuario no existe.");
               } else {
                 console.log("Hola " + nombre + ", bienvenido a tu agenda.");
                 document.getElementById('contenedor').innerHTML = `<index-view pathmodifica="users/${padre}/contactos" key="${padre}" nombre="${nombre}" mail="${email}" perfil="${perfil}" ></index-view>`;

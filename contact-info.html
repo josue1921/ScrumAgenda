@@ -137,8 +137,8 @@
     </div>
     <div class="modal-body">
       <form action="">
-        <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]" readonly="readonly"></image-input>
         <div class="separadorCampos">
+          <center><img src="../imgs/[[imagen]]" id="img" width="200px" height="200px"></center>
           <paper-input label="Nombre" id="name" auto-validate pattern="[a-zA-z\s]{1,}" allowed-pattern="[a-zA-Z\s]" required="true" readonly="readonly">
             <iron-icon icon="account-circle" slot="prefix"></iron-icon>
           </paper-input>
@@ -186,7 +186,7 @@
         if(this.$.img.value == "") {
           imgSele = "../imgs/user.png";
         }else {
-          imgSele = "../imgs/user.png";
+          imgSele = this.$.img.value.name;
         }
         this.$.update.ref.update({
           email: this.$.email.value,
