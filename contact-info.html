@@ -1,0 +1,240 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/file-input/image-input.html">
+
+<dom-module id="contact-info">
+  <template>
+    <firebase-query
+        id="update"
+        app-name="agendascrum"
+        path="[[pathmodifica]]/[[padre]]"
+        data="{{datos}}">
+    </firebase-query>
+    <style>
+      .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 20px; /* Location of the box */
+          left:0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+          border-radius: 10px 10px 10px 10px;
+        }
+
+        /* Modal Content */
+        .modal-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 1px solid #888;
+          width: 30%;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          -webkit-animation-name: animatetop;
+          -webkit-animation-duration: 0.4s;
+          animation-name: animatetop;
+          animation-duration: 0.4s;
+          border-radius: 10px 10px 10px 10px;
+        }
+
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        /* The Close Button */
+        .close {
+          color: black;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .modal-header {
+          padding: 2px 16px;
+
+        }
+        .modal-body {
+          padding: 2px 16px;
+        }
+        .modal-footer {
+          padding: 2px 16px;
+        }
+        .separadorCampos{
+          width:95%;
+          display:inline-block;
+          padding:15px;
+
+        }
+        image-input.top-left {
+          --image-input-width: 300px;
+          --image-input-height: 180px;
+          --image-input-button: {
+            left: -16px;
+            top: -16px;
+            right: auto;
+            bottom: auto;
+            background-color:#acacac;
+          };
+          left:100px;
+          display: flex;
+           justify-content: center;
+        }
+        .btn-cancel{
+          background-color: #ff0000; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .btn-save{
+          background-color: #028107; /* Green */
+         border: none;
+         border-radius:8px;
+         color: white;
+         padding: 10px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 12px;
+         margin: 4px 2px;
+         cursor: pointer;
+        }
+        .div-buttons{
+          display:flex;
+          justify-content: center;
+        }
+    </style>
+    <div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header" id="titleModal">
+    </div>
+    <div class="modal-body">
+      <form action="">
+        <image-input class="top-left" position="center" id="img" preload fade placeholder="[[imagen]]" readonly="readonly"></image-input>
+        <div class="separadorCampos">
+          <paper-input label="Nombre" id="name" auto-validate pattern="[a-zA-z\s]{1,}" allowed-pattern="[a-zA-Z\s]" required="true" readonly="readonly">
+            <iron-icon icon="account-circle" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Correo Electronico" id="email" auto-validate pattern="^([a-z]+[a-z1-9._-]*)@{1}([a-z1-9\.]{2,})\.([a-z]{2,3})" allowed-pattern="[a-zA-z@.]" error-message="Correo invalido" required="true" readonly="readonly">
+            <iron-icon icon="mail" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-input label="Telefono" id="phone" auto-validate allowed-pattern="[0-9]" pattern="(\d){10}" error-message="Numero invaido" required="true" readonly="readonly">
+            <iron-icon icon="settings-phone" slot="prefix"></iron-icon>
+          </paper-input>
+        </div>
+        <div class="modal-footer">
+          <div class="div-buttons">
+            <button type="button" on-click="cerrarModal" class="btn-cancel"> <iron-icon icon="cancel" slot="prefix"></iron-icon>Salir</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  </template>
+  <script>
+    class ContactInfo extends Polymer.Element {
+      static get is() { return 'contact-info'; }
+      static get properties() {
+        return {
+          disparador: {
+            type: Boolean,
+            observer:"mostrarModal"
+          },
+          idselected:{
+            type:Number,
+            value:0,
+            observer:"mostrarDatos"
+          },
+          accion: Number,
+          padre: String,
+          pathmodifica: String,
+          datos: Object,
+          imagen: String
+        };
+      }
+      saveData(){
+        if(!this.validaciones())
+        return;
+        let imgSele = "";
+        if(this.$.img.value == "") {
+          imgSele = "../imgs/user.png";
+        }else {
+          imgSele = "../imgs/user.png";
+        }
+        this.$.update.ref.update({
+          email: this.$.email.value,
+          name: this.$.name.value,
+          phone: this.$.phone.value,
+          image: imgSele
+        });
+        alert("Modificación Exitosa");
+        this.cerrarModal();
+      }
+      validaciones(){
+          if(this.$.name.validate() && this.$.email.validate() && this.$.phone.validate())
+            return true;
+          alert("Introduce datos validos para guardar");
+            return false;
+      }
+      mostrarModal(){
+        let disp=this.get('disparador');
+        if(disp){
+          console.log("mistrando el modal Editar");
+            this.$.myModal.style.display = "block";
+        }else{
+          console.log("mistrando el modal NUEVO");
+        }
+      }
+      cerrarModal(){
+          this.$.myModal.style.display = "none";
+      }
+      mostrarDatos(){
+        let idseleccionado=this.idselected;
+        if(idseleccionado!=0){
+          let datos = this.datos;
+          this.accion = 1;
+          var h2 = document.createElement("h3")
+          h2.innerHTML=`Información de <strong>${this.datos[2].$val}</strong>`
+          h2.style=" text-align: center;"
+          var hr = document.createElement("hr");
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+          this.$.titleModal.appendChild(h2)
+          this.$.titleModal.appendChild(hr)
+          this.$.name.value = this.datos[2].$val;
+          this.imagen = this.datos[1].$val;
+          this.$.email.value = this.datos[0].$val;
+          this.$.phone.value = this.datos[3].$val;
+        }
+      }
+    }
+    window.customElements.define(ContactInfo.is, ContactInfo);
+  </script>
+</dom-module>
